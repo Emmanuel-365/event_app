@@ -1,7 +1,6 @@
 package com.example.event.config;
 
-import com.example.event.DetailService.OrganizerDetailService;
-import com.example.event.DetailService.VisitorDetailService;
+import com.example.event.DetailService.CompositeUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,36 +21,17 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final OrganizerDetailService organizerDetailService;
-    private final VisitorDetailService visitorDetailService;
+    private final CompositeUserDetailsService compositeUserDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    // Organizer Auth Provider
-    @SuppressWarnings("deprecation")
-	@Bean
-    DaoAuthenticationProvider organizerAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(organizerDetailService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    // Visitor Auth Provider
-    @SuppressWarnings("deprecation")
-	@Bean
-    DaoAuthenticationProvider visitorAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(visitorDetailService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    // AuthenticationManager avec les deux providers
+    // AuthenticationManager avec le provider unifié
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
-        auth.authenticationProvider(organizerAuthProvider());
-        auth.authenticationProvider(visitorAuthProvider());
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(compositeUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        auth.authenticationProvider(provider);
         return auth.build();
     }
 
