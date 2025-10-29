@@ -8,6 +8,11 @@ import CreateEvent from './pages/CreateEvent';
 import EventDetails from './pages/EventDetails';
 import ProtectedRoute from './components/ProtectedRoute';
 import MemberManagement from './pages/MemberManagement';
+import MyEvents from './pages/MyEvents';
+import EditEvent from './pages/EditEvent';
+import MySubscriptions from './pages/MySubscriptions';
+import EventSubscribers from './pages/EventSubscribers';
+import Profile from './pages/Profile';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +36,46 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute role="ORGANIZER">
             <MemberManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my-events',
+        element: (
+          <ProtectedRoute role="ORGANIZER">
+            <MyEvents />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/edit-event/:id',
+        element: (
+          <ProtectedRoute role="ORGANIZER">
+            <EditEvent />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my-subscriptions',
+        element: (
+          <ProtectedRoute>
+            <MySubscriptions />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/event-subscribers/:id',
+        element: (
+          <ProtectedRoute role="ORGANIZER">
+            <EventSubscribers />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/profile',
+        element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         ),
       },

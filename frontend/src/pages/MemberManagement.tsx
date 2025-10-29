@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getAllMembers, createMember } from '../services/memberService';
+import { getAllMembers, createMember, updateMember, deleteMember } from '../services/memberService';
 
 const MemberManagement: React.FC = () => {
   const { user } = useAuth();
@@ -14,8 +14,13 @@ const MemberManagement: React.FC = () => {
     name: '',
     surname: '',
     email: '',
-    role: 'COORGANISATEUR', // Default role
+    role: 'COORGANISATEUR',
   });
+
+  // State for editing modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<any | null>(null);
+  const [newRole, setNewRole] = useState('');
 
   const fetchMembers = async () => {
     try {
@@ -23,6 +28,7 @@ const MemberManagement: React.FC = () => {
       setMembers(response.data);
     } catch (err) {
       setListError('Could not fetch members.');
+      console.error(err);
     }
   };
 
@@ -47,13 +53,42 @@ const MemberManagement: React.FC = () => {
       const memberData = { ...formData, id_organizer: user.id };
       await createMember(memberData);
       setFormMessage('Member added successfully!');
-      setFormData({ name: '', surname: '', email: '', role: 'COORGANISATEUR' }); // Reset form
-      fetchMembers(); // Refresh member list
+      setFormData({ name: '', surname: '', email: '', role: 'COORGANISATEUR' });
+      fetchMembers();
     } catch (err) {
       setFormError('Failed to add member. The email might already exist.');
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openEditModal = (member: any) => {
+    setEditingMember(member);
+    setNewRole(member.role);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateMember = async () => {
+    if (!editingMember) return;
+    try {
+      await updateMember(editingMember.id, { ...editingMember, role: newRole });
+      fetchMembers(); // Refresh list
+      setIsEditModalOpen(false);
+      setEditingMember(null);
+    } catch (err) {
+      console.error('Failed to update member', err);
+    }
+  };
+
+  const handleDeleteMember = async (memberId: number) => {
+    if (window.confirm('Are you sure you want to delete this member?')) {
+      try {
+        await deleteMember(memberId);
+        setMembers(members.filter(m => m.id !== memberId));
+      } catch (err) {
+        console.error('Failed to delete member', err);
+      }
     }
   };
 
@@ -101,11 +136,40 @@ const MemberManagement: React.FC = () => {
       {listError && <div className="alert alert-danger">{listError}</div>}
       <ul className="list-group">
         {members.map(member => (
-          <li key={member.id} className="list-group-item">
+          <li key={member.id} className="list-group-item d-flex justify-content-between align-items-center">
             {member.name} {member.surname} ({member.email}) - {member.role}
+            <div>
+              <button className="btn btn-secondary btn-sm me-2" onClick={() => openEditModal(member)}>Edit</button>
+              <button className="btn btn-danger btn-sm" onClick={() => handleDeleteMember(member.id)}>Delete</button>
+            </div>
           </li>
         ))}
       </ul>
+
+      {isEditModalOpen && editingMember && (
+        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Member Role</h5>
+                <button type="button" className="btn-close" onClick={() => setIsEditModalOpen(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p>Editing role for: <strong>{editingMember.name} {editingMember.surname}</strong></p>
+                <select className="form-select" value={newRole} onChange={(e) => setNewRole(e.target.value)}>
+                  <option value="COORGANISATEUR">Co-organizer</option>
+                  <option value="ADJOINT">Assistant</option>
+                  <option value="FONDATEUR">Founder</option>
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setIsEditModalOpen(false)}>Close</button>
+                <button type="button" className="btn btn-primary" onClick={handleUpdateMember}>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

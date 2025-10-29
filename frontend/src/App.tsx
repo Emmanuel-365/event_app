@@ -33,12 +33,27 @@ function App() {
                         <Link className="nav-link" to="/create-event">Create Event</Link>
                       </li>
                       <li className="nav-item">
+                        <Link className="nav-link" to="/my-events">Mes Événements</Link>
+                      </li>
+                      <li className="nav-item">
                         <Link className="nav-link" to="/member-management">Manage Members</Link>
                       </li>
                     </>
                   )}
-                  <li className="nav-item">
-                    <button className="btn btn-link nav-link" onClick={handleLogout}>Logout ({user.email})</button>
+                  {user.role === 'VISITOR' && (
+                    <li className="nav-item">
+                      <Link className="nav-link" to="/my-subscriptions">My Subscriptions</Link>
+                    </li>
+                  )}
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      {user.email}
+                    </a>
+                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <li><Link className="dropdown-item" to="/profile">Mon Profil</Link></li>
+                      <li><hr className="dropdown-divider" /></li>
+                      <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
+                    </ul>
                   </li>
                 </>
               ) : (
