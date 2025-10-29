@@ -12,7 +12,7 @@ public class ImageEvent {
     private Long Id;
     private String imageurl;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="event_id")
     @JsonBackReference
     private Event event;

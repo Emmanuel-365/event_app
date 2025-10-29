@@ -19,7 +19,7 @@ public class TicketCategory {
 
 
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
 

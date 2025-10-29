@@ -24,7 +24,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private Statut_Event statut;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="organizer_id")
     @JsonBackReference
     private Organizer organizer;

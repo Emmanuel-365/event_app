@@ -20,17 +20,17 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private Statut_Subscription statut;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "event_id")
     @JsonBackReference
     private Event event;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "visitor_id")
     @JsonBackReference
     private Visitor visitor;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "ticket_id")
     private TicketCategory ticket;
     //ticket

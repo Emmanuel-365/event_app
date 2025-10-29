@@ -9,6 +9,7 @@
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/Exception/MethodNotAllowedException.java
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/Exception/handler/AppExceptionHandler.java
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/config/AppConfig.java
+/home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/config/DataInitializer.java
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/config/SecurityConfig.java
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/controller/EventController.java
 /home/school/Documents/L3/S1/INF331/INF3311/projet_CC/projet_331/src/main/java/com/example/event/controller/ImageController.java

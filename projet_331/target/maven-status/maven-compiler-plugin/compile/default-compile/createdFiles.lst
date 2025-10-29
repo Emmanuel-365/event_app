@@ -5,6 +5,7 @@ com/example/event/repository/SubscriptionRepository.class
 com/example/event/controller/MemberController.class
 com/example/event/controller/ImageController.class
 com/example/event/model/Statut_Event.class
+com/example/event/config/DataInitializer.class
 com/example/event/dto/Event/EventResponse.class
 com/example/event/dto/ErrorMessage$ErrorMessageBuilder.class
 com/example/event/model/Subscription.class

@@ -20,7 +20,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "organizer_id")
     @JsonBackReference
     private Organizer organizer;
