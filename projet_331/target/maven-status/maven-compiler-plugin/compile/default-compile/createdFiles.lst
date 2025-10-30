@@ -3,6 +3,7 @@ com/example/event/Exception/MethodNotAllowedException.class
 com/example/event/service/SubscriptionService.class
 com/example/event/repository/SubscriptionRepository.class
 com/example/event/controller/MemberController.class
+com/example/event/DetailService/CompositeUserDetailsService.class
 com/example/event/controller/ImageController.class
 com/example/event/model/Statut_Event.class
 com/example/event/config/DataInitializer.class

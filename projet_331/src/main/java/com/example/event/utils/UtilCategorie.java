@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class UtilCategorie {
     public static TicketCategoryResponse convertToCategorieResponse(TicketCategory cat) {
         return new TicketCategoryResponse(
-
+                cat.getId(),
                 cat.getIntitule(),
                 cat.getPrix(),
                 cat.getEvent().getTitle()

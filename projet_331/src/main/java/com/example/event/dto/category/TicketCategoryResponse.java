@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class TicketCategoryResponse{
 
+    private Long id;
     private String intitule;
     private int prix;
     private String event_name;

@@ -1,4 +1,6 @@
 package com.example.event.service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.example.event.dto.Subscription.SubscriptionRequest;
 import com.example.event.dto.Subscription.SubscriptionResponse;
 import com.example.event.model.*;
@@ -15,6 +17,7 @@ import com.example.event.Exception.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SubscriptionService {
@@ -71,11 +74,11 @@ public class SubscriptionService {
         ticketCategoryRepository.save(ticketCategory);
 
         //Envoie du ticket
-        emailSenderService.sendEmail(
+        /* emailSenderService.sendEmail(
                 visitor.getEmail(),"Ticket de Confirmation pour l'Évènement "+event.getTitle(),
                 "Merci pour votre enregistrement: Evenement "+event.getTitle()+" - Visiteur : "+visitor.getName()+" "+visitor.getName()
                         +" - Nombre de places : "+subscription.getPlaces()+" - Montant Total : "+ subscription.getMontant()
-                        +" - Code Ticket : "+subscription.getCodeticket());
+                        +" - Code Ticket : "+subscription.getCodeticket());*/
 
         SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
 
@@ -111,5 +114,32 @@ public class SubscriptionService {
             throw new EntityNotFoundException(" Souscription Introuvable");
         }
         return ResponseEntity.ok("Suppression reussie !");
+    }
+
+    public ResponseEntity<?> getSubscriptionsByVisitor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String visitorEmail = authentication.getName();
+
+        Visitor visitor = visitorRepository.findByEmail(visitorEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Visitor not found with email: " + visitorEmail));
+
+        List<Subscription> subscriptions = visitor.getSubscriptionList();
+        List<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
+        for(Subscription subscription : subscriptions) {
+            SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
+            subscriptionResponses.add(subscriptionResponse);
+        }
+        return ResponseEntity.ok(subscriptionResponses);
+    }
+
+    public ResponseEntity<?> getSubscriptionsByEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        List<SubscriptionResponse> subscriptionResponses = event.getSubscriptionList().stream()
+                .map(UtilSubscription::convertToSubscriptionResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(subscriptionResponses);
     }
 }

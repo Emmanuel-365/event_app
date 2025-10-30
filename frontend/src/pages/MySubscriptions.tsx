@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getSubscriptionsByUser } from '../services/subscriptionService';
 
 interface Subscription {
   id: number;
-  event: {
-    id: number;
-    title: string;
-    debut: string;
-    lieu: string;
-  };
-  ticketCategory: {
-    intitule: string;
-  };
+  event_id: number;
+  event_name: string;
+  event_debut: string;
+  event_lieu: string;
+  nom_ticket: string;
   places: number;
 }
 
@@ -39,30 +36,39 @@ const MySubscriptions: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading your subscriptions...</div>;
+    return <div className="text-center p-8 text-gray-500 dark:text-gray-400">Loading your subscriptions...</div>;
   }
 
   if (error) {
-    return <div className="alert alert-danger">{error}</div>;
+    return <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>;
   }
 
   return (
-    <div>
-      <h1>My Subscriptions</h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">My Subscriptions</h1>
       {subscriptions.length === 0 ? (
-        <p>You have not subscribed to any events yet.</p>
+        <div className="text-center bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+          <p className="text-gray-500 dark:text-gray-400">You have not subscribed to any events yet.</p>
+          <Link to="/" className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline">Browse events</Link>
+        </div>
       ) : (
-        <div className="list-group">
+        <div className="space-y-4">
           {subscriptions.map(sub => (
-            <div key={sub.id} className="list-group-item">
-              <h5 className="mb-1">{sub.event.title}</h5>
-              <p className="mb-1">
-                Date: {new Date(sub.event.debut).toLocaleDateString()} | Location: {sub.event.lieu}
-              </p>
-              <p className="mb-1">
-                Ticket: {sub.ticketCategory.intitule} | Places: {sub.places}
-              </p>
-              <a href={`/event/${sub.event.id}`} className="btn btn-primary btn-sm mt-2">View Event</a>
+            <div key={sub.id} className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <div className="flex-grow mb-4 sm:mb-0">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{sub.event_name}</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {new Date(sub.event_debut).toLocaleDateString()} &middot; {sub.event_lieu}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                  Ticket: <span className="font-semibold">{sub.nom_ticket}</span> | Places: <span className="font-semibold">{sub.places}</span>
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <Link to={`/event/${sub.event_id}`} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  View Event
+                </Link>
+              </div>
             </div>
           ))}
         </div>

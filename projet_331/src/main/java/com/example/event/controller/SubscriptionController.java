@@ -32,4 +32,14 @@ public class SubscriptionController {
     public ResponseEntity<?> deleteSubscription(@PathVariable Long id) {
         return subscriptionService.deleteSubscription(id);
     }
+
+    @GetMapping("/visitor/me")
+    public ResponseEntity<?> getMySubscriptions() {
+        return subscriptionService.getSubscriptionsByVisitor();
+    }
+
+    @GetMapping("/event/{id}")
+    public ResponseEntity<?> getSubscriptionsByEvent(@PathVariable Long id) {
+        return subscriptionService.getSubscriptionsByEvent(id);
+    }
 }

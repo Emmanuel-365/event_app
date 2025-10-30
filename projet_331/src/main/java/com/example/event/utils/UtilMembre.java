@@ -9,6 +9,7 @@ public class UtilMembre {
 
     public static MemberResponse convertToMemberResponse(Member member){
         return new MemberResponse(
+                member.getId(),
                 member.getName(),
                 member.getSurname(),
                 member.getEmail(),

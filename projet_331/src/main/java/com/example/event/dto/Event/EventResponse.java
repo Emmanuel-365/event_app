@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class EventResponse {
+    private Long id;
     private String title;
     private String description;
     private int places;

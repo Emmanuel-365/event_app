@@ -17,7 +17,6 @@ const MemberManagement: React.FC = () => {
     role: 'COORGANISATEUR',
   });
 
-  // State for editing modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<any | null>(null);
   const [newRole, setNewRole] = useState('');
@@ -73,7 +72,7 @@ const MemberManagement: React.FC = () => {
     if (!editingMember) return;
     try {
       await updateMember(editingMember.id, { ...editingMember, role: newRole });
-      fetchMembers(); // Refresh list
+      fetchMembers();
       setIsEditModalOpen(false);
       setEditingMember(null);
     } catch (err) {
@@ -92,80 +91,84 @@ const MemberManagement: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <h1>Member Management</h1>
-      
-      <div className="card mb-4">
-        <div className="card-body">
-          <h5 className="card-title">Add New Member</h5>
-          <form onSubmit={handleSubmit}>
-            {formError && <div className="alert alert-danger">{formError}</div>}
-            {formMessage && <div className="alert alert-success">{formMessage}</div>}
+  const inputStyle = "mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-gray-900 dark:text-white";
+  const labelStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
 
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">Name</label>
-              <input type="text" id="name" name="name" placeholder="Name" value={formData.name} onChange={handleChange} className="form-control" required />
+  return (
+    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-1">
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add New Member</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {formError && <div className="bg-red-100 border-red-400 text-red-700 px-4 py-2 rounded text-sm">{formError}</div>}
+            {formMessage && <div className="bg-green-100 border-green-400 text-green-700 px-4 py-2 rounded text-sm">{formMessage}</div>}
+            
+            <div>
+              <label htmlFor="name" className={labelStyle}>Name</label>
+              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} className={inputStyle} required />
             </div>
-            <div className="mb-3">
-              <label htmlFor="surname" className="form-label">Surname</label>
-              <input type="text" id="surname" name="surname" placeholder="Surname" value={formData.surname} onChange={handleChange} className="form-control" required />
+            <div>
+              <label htmlFor="surname" className={labelStyle}>Surname</label>
+              <input type="text" id="surname" name="surname" value={formData.surname} onChange={handleChange} className={inputStyle} required />
             </div>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input type="email" id="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control" required />
+            <div>
+              <label htmlFor="email" className={labelStyle}>Email</label>
+              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle} required />
             </div>
-            <div className="mb-3">
-              <label htmlFor="role" className="form-label">Role</label>
-              <select id="role" name="role" value={formData.role} onChange={handleChange} className="form-select">
+            <div>
+              <label htmlFor="role" className={labelStyle}>Role</label>
+              <select id="role" name="role" value={formData.role} onChange={handleChange} className={inputStyle}>
                 <option value="COORGANISATEUR">Co-organizer</option>
                 <option value="ADJOINT">Assistant</option>
                 <option value="FONDATEUR">Founder</option>
               </select>
             </div>
-            <div className="d-grid">
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? 'Adding Member...' : 'Add Member'}
+            <div className="flex justify-end">
+              <button type="submit" className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400" disabled={loading}>
+                {loading ? 'Adding...' : 'Add Member'}
               </button>
             </div>
           </form>
         </div>
       </div>
 
-      <h5>Existing Members</h5>
-      {listError && <div className="alert alert-danger">{listError}</div>}
-      <ul className="list-group">
-        {members.map(member => (
-          <li key={member.id} className="list-group-item d-flex justify-content-between align-items-center">
-            {member.name} {member.surname} ({member.email}) - {member.role}
-            <div>
-              <button className="btn btn-secondary btn-sm me-2" onClick={() => openEditModal(member)}>Edit</button>
-              <button className="btn btn-danger btn-sm" onClick={() => handleDeleteMember(member.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="lg:col-span-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Member Management</h1>
+        {listError && <div className="bg-red-100 border-red-400 text-red-700 px-4 py-3 rounded">{listError}</div>}
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {members.length > 0 ? members.map(member => (
+              <li key={member.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center">
+                  <div className="flex-1 mb-4 sm:mb-0">
+                    <p className="text-md font-semibold text-gray-900 dark:text-white">{member.name} {member.surname}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{member.email}</p>
+                    <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{member.role}</p>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center space-x-2">
+                    <button onClick={() => openEditModal(member)} className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</button>
+                    <button onClick={() => handleDeleteMember(member.id)} className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Delete</button>
+                  </div>
+                </div>
+              </li>
+            )) : <p className="p-4 text-gray-500 dark:text-gray-400">No members found.</p>}
+          </ul>
+        </div>
+      </div>
 
       {isEditModalOpen && editingMember && (
-        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Member Role</h5>
-                <button type="button" className="btn-close" onClick={() => setIsEditModalOpen(false)}></button>
-              </div>
-              <div className="modal-body">
-                <p>Editing role for: <strong>{editingMember.name} {editingMember.surname}</strong></p>
-                <select className="form-select" value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-                  <option value="COORGANISATEUR">Co-organizer</option>
-                  <option value="ADJOINT">Assistant</option>
-                  <option value="FONDATEUR">Founder</option>
-                </select>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setIsEditModalOpen(false)}>Close</button>
-                <button type="button" className="btn btn-primary" onClick={handleUpdateMember}>Save changes</button>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Edit Member Role</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Editing role for: <strong className="font-semibold">{editingMember.name} {editingMember.surname}</strong></p>
+            <select className={inputStyle} value={newRole} onChange={(e) => setNewRole(e.target.value)}>
+              <option value="COORGANISATEUR">Co-organizer</option>
+              <option value="ADJOINT">Assistant</option>
+              <option value="FONDATEUR">Founder</option>
+            </select>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button type="button" className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500" onClick={() => setIsEditModalOpen(false)}>Close</button>
+              <button type="button" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700" onClick={handleUpdateMember}>Save Changes</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface EventCardProps {
   event: {
@@ -16,16 +17,19 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   return (
-    <div className="card mb-3">
-      <img src={event.profil_url || 'https://via.placeholder.com/150'} className="card-img-top" alt={event.title} />
-      <div className="card-body">
-        <h5 className="card-title">{event.title}</h5>
-        <p className="card-text">{event.description}</p>
-        <p className="card-text"><small className="text-muted">Location: {event.lieu}</small></p>
-        <p className="card-text"><small className="text-muted">From: {event.debut} To: {event.fin}</small></p>
-        <p className="card-text"><small className="text-muted">Places: {event.places}</small></p>
-        <p className="card-text"><small className="text-muted">Organizer: {event.organizer_name}</small></p>
-        <a href={`/event/${event.id}`} className="btn btn-primary">View Details</a>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+      <img src={event.profil_url || 'https://via.placeholder.com/300x200'} className="w-full h-48 object-cover" alt={event.title} />
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate">{event.title}</h3>
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 h-20 overflow-hidden">{event.description}</p>
+        <div className="text-xs text-gray-500 dark:text-gray-300 space-y-1 mb-4">
+          <p className="truncate"><strong>Location:</strong> {event.lieu}</p>
+          <p><strong>Date:</strong> {new Date(event.debut).toLocaleDateString()}</p>
+          <p><strong>Organizer:</strong> {event.organizer_name}</p>
+        </div>
+        <Link to={`/event/${event.id}`} className="inline-block w-full text-center bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300">
+          View Details
+        </Link>
       </div>
     </div>
   );

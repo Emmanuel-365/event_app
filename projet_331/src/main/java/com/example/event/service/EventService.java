@@ -10,10 +10,13 @@ import com.example.event.repository.OrganizerRepository;
 import com.example.event.utils.UtilEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EventService {
@@ -115,4 +118,17 @@ public class EventService {
 
     }
 
+    public ResponseEntity<?> getEventsByOrganizer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String organizerEmail = authentication.getName();
+
+        Organizer organizer = organizerRepository.findByEmail(organizerEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Organizer not found with email: " + organizerEmail));
+
+        List<EventResponse> eventResponses = organizer.getEvents().stream()
+                .map(UtilEvent::convertToEventResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(eventResponses);
+    }
 }

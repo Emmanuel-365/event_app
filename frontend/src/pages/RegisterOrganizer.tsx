@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { registerOrganizer } from '../services/organizerService';
 
 const RegisterOrganizer: React.FC = () => {
@@ -39,62 +40,44 @@ const RegisterOrganizer: React.FC = () => {
   };
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-6">
-        <div className="card">
-          <div className="card-body">
-            <h1 className="card-title text-center">Register as Organizer</h1>
-            <form onSubmit={handleSubmit}>
-              {error && <div className="alert alert-danger">{error}</div>}
-              {message && <div className="alert alert-success">{message}</div>}
-
-              <div className="mb-3">
-                <label htmlFor="name" className="form-label">Organizer Name</label>
-                <input type="text" id="name" name="name" placeholder="Organizer Name" value={formData.name} onChange={handleChange} className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">Email</label>
-                <input type="email" id="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="phone" className="form-label">Phone</label>
-                <input type="text" id="phone" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">Password</label>
-                <input type="password" id="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="annee_activite" className="form-label">Years of Activity</label>
-                <input type="number" id="annee_activite" name="annee_activite" placeholder="Years of activity" value={formData.annee_activite} onChange={handleChange} className="form-control" required />
-              </div>
-              <hr />
-              <p className="text-muted">Optional Information</p>
-              <div className="mb-3">
-                <label htmlFor="instagram_url" className="form-label">Instagram URL</label>
-                <input type="text" id="instagram_url" name="instagram_url" placeholder="Instagram URL" value={formData.instagram_url} onChange={handleChange} className="form-control" />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="facebook_url" className="form-label">Facebook URL</label>
-                <input type="text" id="facebook_url" name="facebook_url" placeholder="Facebook URL" value={formData.facebook_url} onChange={handleChange} className="form-control" />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="whatsapp_url" className="form-label">WhatsApp URL</label>
-                <input type="text" id="whatsapp_url" name="whatsapp_url" placeholder="WhatsApp URL" value={formData.whatsapp_url} onChange={handleChange} className="form-control" />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="profil_url" className="form-label">Profile URL</label>
-                <input type="text" id="profil_url" name="profil_url" placeholder="Profile URL" value={formData.profil_url} onChange={handleChange} className="form-control" />
-              </div>
-
-              <div className="d-grid">
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Registering...' : 'Register'}
-                </button>
-              </div>
-            </form>
-          </div>
+    <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            Register as an Organizer
+          </h2>
         </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
+          {message && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">{message}</div>}
+
+          <div className="rounded-md shadow-sm -space-y-px">
+            <input name="name" type="text" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Organizer Name" value={formData.name} onChange={handleChange} />
+            <input name="email" type="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Email address" value={formData.email} onChange={handleChange} />
+            <input name="phone" type="text" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Phone" value={formData.phone} onChange={handleChange} />
+            <input name="password" type="password" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Password" value={formData.password} onChange={handleChange} />
+            <input name="annee_activite" type="number" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Years of Activity" value={formData.annee_activite} onChange={handleChange} />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">Optional Information</p>
+            <input name="instagram_url" type="text" className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Instagram URL" value={formData.instagram_url} onChange={handleChange} />
+            <input name="facebook_url" type="text" className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Facebook URL" value={formData.facebook_url} onChange={handleChange} />
+            <input name="whatsapp_url" type="text" className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="WhatsApp URL" value={formData.whatsapp_url} onChange={handleChange} />
+            <input name="profil_url" type="text" className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Profile URL" value={formData.profil_url} onChange={handleChange} />
+          </div>
+
+          <div>
+            <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400">
+              {loading ? 'Registering...' : 'Register'}
+            </button>
+          </div>
+          <div className="text-sm text-center">
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );

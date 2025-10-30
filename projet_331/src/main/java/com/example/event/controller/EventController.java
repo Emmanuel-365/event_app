@@ -37,4 +37,9 @@ public class EventController {
     public ResponseEntity<?> updateEvent(@RequestBody EventRequest eventRequest,@PathVariable Long id){
         return eventService.updateEvent(eventRequest,id);
     }
+
+    @GetMapping("/organizer/me")
+    public ResponseEntity<?> getMyEvents(){
+        return eventService.getEventsByOrganizer();
+    }
 }

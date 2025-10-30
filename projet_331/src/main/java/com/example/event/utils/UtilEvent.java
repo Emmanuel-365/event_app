@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class UtilEvent {
     public static EventResponse convertToEventResponse(Event event){
         EventResponse response = new EventResponse();
+        response.setId(event.getId());
         response.setTitle(event.getTitle());
         response.setDescription(event.getDescription());
         response.setPlaces(event.getPlaces());

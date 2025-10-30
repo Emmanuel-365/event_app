@@ -8,12 +8,16 @@ import org.springframework.stereotype.Component;
 public class UtilSubscription {
     public static SubscriptionResponse convertToSubscriptionResponse(Subscription subscription) {
         return new SubscriptionResponse(
+                subscription.getId(),
                 subscription.getMontant(),
                 subscription.getPlaces(),
                 subscription.getCreatedAt(),
                 subscription.getVisitor().getId(),
                 subscription.getVisitor().getName(),
+                subscription.getEvent().getId(),
                 subscription.getEvent().getTitle(),
+                subscription.getEvent().getDebut(),
+                subscription.getEvent().getLieu(),
                 subscription.getEvent().getOrganizer().getName(),
                 subscription.getTicket().getIntitule()
         );

@@ -12,6 +12,7 @@ import MyEvents from './pages/MyEvents';
 import EditEvent from './pages/EditEvent';
 import MySubscriptions from './pages/MySubscriptions';
 import EventSubscribers from './pages/EventSubscribers';
+import Register from './pages/Register';
 import Profile from './pages/Profile';
 
 const router = createBrowserRouter([
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <ProtectedRoute><Home /></ProtectedRoute> },
       { path: '/login', element: <Login /> },
+      { path: '/register', element: <Register /> },
       { path: '/register-visitor', element: <RegisterVisitor /> },
       { path: '/register-organizer', element: <RegisterOrganizer /> },
       {

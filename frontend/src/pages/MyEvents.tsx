@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { deleteEvent, getEventsByOrganizer } from '../services/eventService';
 import { Link } from 'react-router-dom';
 
-// Define the event type based on your data structure
 interface Event {
   id: number;
   title: string;
@@ -51,35 +50,47 @@ const MyEvents: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading your events...</div>;
+    return <div className="text-center p-8 text-gray-500 dark:text-gray-400">Loading your events...</div>;
   }
 
   if (error) {
-    return <div className="alert alert-danger">{error}</div>;
+    return <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>;
   }
 
   return (
-    <div>
-      <h1>My Events</h1>
+    <div className="max-w-7xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Events</h1>
+        <Link to="/create-event" className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Create New Event
+        </Link>
+      </div>
+      
       {events.length === 0 ? (
-        <p>You have not created any events yet. <Link to="/create-event">Create one now!</Link></p>
+        <div className="text-center bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+          <p className="text-gray-500 dark:text-gray-400">You have not created any events yet.</p>
+          <Link to="/create-event" className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline">Create one now!</Link>
+        </div>
       ) : (
-        <div className="list-group">
-          {events.map(event => (
-            <div key={event.id} className="list-group-item list-group-item-action flex-column align-items-start">
-              <div className="d-flex w-100 justify-content-between">
-                <h5 className="mb-1">{event.title}</h5>
-                <small>{new Date(event.debut).toLocaleDateString()}</small>
-              </div>
-              <p className="mb-1">{event.description.substring(0, 100)}...</p>
-              <small>Location: {event.lieu} | Places: {event.places}</small>
-              <div className="mt-3">
-                <Link to={`/edit-event/${event.id}`} className="btn btn-secondary btn-sm me-2">Edit</Link>
-                <button onClick={() => handleDelete(event.id)} className="btn btn-danger btn-sm me-2">Delete</button>
-                <Link to={`/event-subscribers/${event.id}`} className="btn btn-info btn-sm">View Subscribers</Link>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {events.map(event => (
+              <li key={event.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center">
+                  <div className="flex-1 mb-4 sm:mb-0">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{event.title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{event.description}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{event.lieu} &middot; {new Date(event.debut).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center space-x-2">
+                    <Link to={`/edit-event/${event.id}`} className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</Link>
+                    <button onClick={() => handleDelete(event.id)} className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Delete</button>
+                    <Link to={`/event-subscribers/${event.id}`} className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Subscribers</Link>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
