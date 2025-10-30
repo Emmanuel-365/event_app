@@ -56,6 +56,7 @@ public class SubscriptionService {
 
         subscription.setCodeticket(codeticket);
 
+        subscription.setStatut(Statut_Subscription.REUSSI);
 
         //Calcul du montant total
        int  montant = subscriptionRequest.getPlaces() * ticketCategory.getPrix();
