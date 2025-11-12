@@ -13,7 +13,7 @@ import java.util.List;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     private String title;
     private String description;
     private String lieu;
@@ -25,9 +25,9 @@ public class Event {
     private Statut_Event statut;
 
     @ManyToOne
-    @JoinColumn(name="organizer_id")
+    @JoinColumn(name="organizer_profile_id")
     @JsonBackReference
-    private Organizer organizer;
+    private OrganizerProfile organizerProfile;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
     @JsonManagedReference

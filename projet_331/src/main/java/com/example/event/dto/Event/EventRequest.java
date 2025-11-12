@@ -16,7 +16,6 @@ public class EventRequest {
     private String lieu;
     private LocalDate debut;
     private LocalDate fin;
-    private Long id_organizer;
     private String profil_url;
 	public String getTitle() {
 		return title;
@@ -53,12 +52,6 @@ public class EventRequest {
 	}
 	public void setLieu(String lieu) {
 		this.lieu = lieu;
-	}
-	public Long getId_organizer() {
-		return id_organizer;
-	}
-	public void setId_organizer(Long id_organizer) {
-		this.id_organizer = id_organizer;
 	}
 	public String getProfil_url() {
 		return profil_url;

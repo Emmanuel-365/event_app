@@ -10,7 +10,7 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     private String name;
     private String Surname;
     private String email;
@@ -21,8 +21,8 @@ public class Member {
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "organizer_id")
+    @JoinColumn(name = "organizer_profile_id")
     @JsonBackReference
-    private Organizer organizer;
+    private OrganizerProfile organizerProfile;
 
 }

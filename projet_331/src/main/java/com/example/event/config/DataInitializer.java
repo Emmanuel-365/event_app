@@ -1,23 +1,21 @@
 package com.example.event.config;
 
 import com.example.event.model.*;
-import com.example.event.repository.*;
+import com.example.event.repository.EventRepository;
+import com.example.event.repository.TicketCategoryRepository;
+import com.example.event.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
-    private OrganizerRepository organizerRepository;
-
-    @Autowired
-    private VisitorRepository visitorRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private EventRepository eventRepository;
@@ -30,26 +28,38 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (organizerRepository.count() == 0) {
-            // Create Organizer
-            Organizer organizer = new Organizer();
-            organizer.setName("EventCorp");
-            organizer.setEmail("organizer@example.com");
-            organizer.setPhone("123456789");
-            organizer.setPassword(passwordEncoder.encode("password"));
-            organizer.setAnnee_activite(5);
-            organizerRepository.save(organizer);
+        if (userRepository.count() == 0) {
+            // Create Organizer User and Profile
+            User organizerUser = new User();
+            organizerUser.setEmail("organizer@example.com");
+            organizerUser.setPassword(passwordEncoder.encode("password"));
+            organizerUser.setRole(UserRole.ROLE_ORGANIZER);
 
-            // Create Visitor
-            Visitor visitor = new Visitor();
-            visitor.setName("John");
-            visitor.setSurname("Doe");
-            visitor.setEmail("visitor@example.com");
-            visitor.setPhone("987654321");
-            visitor.setCity("New York");
-            visitor.setPassword(passwordEncoder.encode("password"));
-            visitor.setDate_inscription(LocalDate.now());
-            visitorRepository.save(visitor);
+            OrganizerProfile organizerProfile = new OrganizerProfile();
+            organizerProfile.setName("EventCorp");
+            organizerProfile.setPhone("123456789");
+            organizerProfile.setAnnee_activite(5);
+            organizerProfile.setUser(organizerUser);
+            organizerUser.setOrganizerProfile(organizerProfile);
+            
+            userRepository.save(organizerUser);
+
+            // Create Visitor User and Profile
+            User visitorUser = new User();
+            visitorUser.setEmail("visitor@example.com");
+            visitorUser.setPassword(passwordEncoder.encode("password"));
+            visitorUser.setRole(UserRole.ROLE_VISITOR);
+
+            VisitorProfile visitorProfile = new VisitorProfile();
+            visitorProfile.setName("John");
+            visitorProfile.setSurname("Doe");
+            visitorProfile.setPhone("987654321");
+            visitorProfile.setCity("New York");
+            visitorProfile.setDate_inscription(LocalDate.now());
+            visitorProfile.setUser(visitorUser);
+            visitorUser.setVisitorProfile(visitorProfile);
+
+            userRepository.save(visitorUser);
 
             // Create Event 1
             Event event1 = new Event();
@@ -60,7 +70,7 @@ public class DataInitializer implements CommandLineRunner {
             event1.setDebut(LocalDate.now().plusDays(10));
             event1.setFin(LocalDate.now().plusDays(10));
             event1.setStatut(Statut_Event.PROCHAINEMENT);
-            event1.setOrganizer(organizer);
+            event1.setOrganizerProfile(organizerProfile);
             eventRepository.save(event1);
 
             // Create Tickets for Event 1
@@ -85,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
             event2.setDebut(LocalDate.now().plusMonths(2));
             event2.setFin(LocalDate.now().plusMonths(2).plusDays(2));
             event2.setStatut(Statut_Event.PROCHAINEMENT);
-            event2.setOrganizer(organizer);
+            event2.setOrganizerProfile(organizerProfile);
             eventRepository.save(event2);
 
             // Create Tickets for Event 2

@@ -12,13 +12,13 @@ public class UtilSubscription {
                 subscription.getMontant(),
                 subscription.getPlaces(),
                 subscription.getCreatedAt(),
-                subscription.getVisitor().getId(),
-                subscription.getVisitor().getName(),
+                subscription.getVisitorProfile().getId(),
+                subscription.getVisitorProfile().getName(),
                 subscription.getEvent().getId(),
                 subscription.getEvent().getTitle(),
                 subscription.getEvent().getDebut(),
                 subscription.getEvent().getLieu(),
-                subscription.getEvent().getOrganizer().getName(),
+                subscription.getEvent().getOrganizerProfile().getName(),
                 subscription.getTicket().getIntitule()
         );
     }

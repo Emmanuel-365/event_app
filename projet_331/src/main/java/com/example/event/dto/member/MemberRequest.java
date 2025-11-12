@@ -16,7 +16,6 @@ public class MemberRequest {
     private String email;
     private String instagram_url;
     private String facebook_url;
-    private Long id_organizer;
     private String profil_url;
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -49,12 +48,6 @@ public class MemberRequest {
 	}
 	public void setFacebook_url(String facebook_url) {
 		this.facebook_url = facebook_url;
-	}
-	public Long getId_organizer() {
-		return id_organizer;
-	}
-	public void setId_organizer(Long id_organizer) {
-		this.id_organizer = id_organizer;
 	}
 	public String getProfil_url() {
 		return profil_url;

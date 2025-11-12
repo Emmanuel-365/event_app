@@ -17,7 +17,7 @@ public class UtilEvent {
         response.setLieu(event.getLieu());
         response.setDebut(event.getDebut());
         response.setFin(event.getFin());
-        response.setOrganizer_name(event.getOrganizer().getName());
+        response.setOrganizer_name(event.getOrganizerProfile().getName());
         response.setStatutEvent(event.getStatut());
         response.setProfil_url(event.getProfil_url());
 
@@ -28,6 +28,15 @@ public class UtilEvent {
                      .collect(Collectors.toList())
             );
         }
+
+        if (event.getImages() != null) {
+            response.setImages(
+                event.getImages().stream()
+                     .map(UtilImage::convertToImageResponse)
+                     .collect(Collectors.toList())
+            );
+        }
+        
         return response;
     }
 }

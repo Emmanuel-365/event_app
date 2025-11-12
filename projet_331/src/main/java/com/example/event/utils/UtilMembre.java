@@ -15,7 +15,7 @@ public class UtilMembre {
                 member.getEmail(),
                 member.getInstagram_url(),
                 member.getFacebook_url(),
-                member.getOrganizer().getName(),
+                member.getOrganizerProfile().getName(),
                 member.getProfil_url(),
                 member.getRole()
         );

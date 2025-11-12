@@ -1,6 +1,7 @@
 package com.example.event.dto.Event;
 
 import com.example.event.dto.category.TicketCategoryResponse;
+import com.example.event.dto.image.ImageResponse;
 import com.example.event.model.Statut_Event;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,6 +28,7 @@ public class EventResponse {
     private Statut_Event statutEvent;
     private String profil_url;
     private List<TicketCategoryResponse> ticketCategoryList;
+    private List<ImageResponse> images;
 
 	public String getTitle() {
 		return title;

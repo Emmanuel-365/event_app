@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 public class SubscriptionRequest {
     private int places;
     private Long id_event;
-    private Long id_visitor;
     private Long id_ticket;
 }

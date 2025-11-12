@@ -1,6 +1,6 @@
 package com.example.event.config;
 
-import com.example.event.DetailService.CompositeUserDetailsService;
+import com.example.event.DetailService.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +21,14 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CompositeUserDetailsService compositeUserDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    // AuthenticationManager avec le provider unifié
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(compositeUserDetailsService);
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         auth.authenticationProvider(provider);
         return auth.build();
@@ -53,31 +52,30 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/organizer/register").permitAll()
-                        .requestMatchers("/visitor/register").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/event", "/event/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/event").hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/event/**").hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.DELETE, "/event/**").hasRole("ORGANIZER")
-                        .requestMatchers("/organizer/**").hasRole("ORGANIZER")
-                        .requestMatchers("/member/**").hasRole("ORGANIZER")
-                        .requestMatchers("/ticket/**").hasRole("ORGANIZER")
-                        .requestMatchers("/image/**").hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/subscription").hasRole("VISITOR")
-                        .requestMatchers(HttpMethod.GET, "/subscription/visitor/me").hasRole("VISITOR")
-                        .requestMatchers(HttpMethod.GET, "/subscription/event/**").hasRole("ORGANIZER")
-                        .requestMatchers("/visitor/**").hasRole("VISITOR")
+                        .requestMatchers(HttpMethod.POST, "/event").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.PUT, "/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.DELETE, "/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/member/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/ticket/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/image/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/api/stats/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/subscription").hasAuthority("ROLE_VISITOR")
+                        .requestMatchers(HttpMethod.GET, "/subscription/visitor/me").hasAuthority("ROLE_VISITOR")
+                        .requestMatchers(HttpMethod.GET, "/subscription/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/api/profile/me").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
-                            // Redirection selon le rôle
+                            // Redirection based on role
                             String role = authentication.getAuthorities().iterator().next().getAuthority();
-                            if(role.equals("ROLE_ORGANIZER")) {
-                                response.sendRedirect("/organizer/home");
-                            } else if(role.equals("ROLE_VISITOR")) {
-                                response.sendRedirect("/visitor/home");
+                            if (role.equals("ROLE_ORGANIZER")) {
+                                response.sendRedirect("/api/profile/me"); // Redirect to a unified profile endpoint
+                            } else if (role.equals("ROLE_VISITOR")) {
+                                response.sendRedirect("/api/profile/me"); // Redirect to a unified profile endpoint
                             } else {
                                 response.sendRedirect("/"); // fallback
                             }

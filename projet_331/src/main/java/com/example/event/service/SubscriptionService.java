@@ -1,134 +1,116 @@
 package com.example.event.service;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.example.event.Exception.EntityNotFoundException;
+import com.example.event.Exception.ForbiddenException;
 import com.example.event.dto.Subscription.SubscriptionRequest;
 import com.example.event.dto.Subscription.SubscriptionResponse;
 import com.example.event.model.*;
 import com.example.event.repository.EventRepository;
 import com.example.event.repository.SubscriptionRepository;
 import com.example.event.repository.TicketCategoryRepository;
-import com.example.event.repository.VisitorRepository;
+import com.example.event.repository.VisitorProfileRepository;
 import com.example.event.utils.UtilSubscription;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.example.event.Exception.EntityNotFoundException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SubscriptionService {
 
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
-    @Autowired
-    private EventRepository eventRepository;
-    @Autowired
-    private TicketCategoryRepository ticketCategoryRepository;
-    @Autowired
-    private VisitorRepository visitorRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final EventRepository eventRepository;
+    private final TicketCategoryRepository ticketCategoryRepository;
+    private final VisitorProfileRepository visitorProfileRepository;
+    private final ProfileService profileService;
+    private final EmailSenderService emailSenderService;
 
-    @Autowired
-    private EmailSenderService emailSenderService;
-
-    public ResponseEntity<?> createSubscription(SubscriptionRequest subscriptionRequest){
-
-        Visitor visitor = visitorRepository.findById(subscriptionRequest.getId_visitor()).orElse(null);
-        Event event = eventRepository.findById(subscriptionRequest.getId_event()).orElse(null);
-        TicketCategory ticketCategory = ticketCategoryRepository.findById(subscriptionRequest.getId_ticket()).orElse(null);
-
-        if(visitor == null || event == null || ticketCategory == null){
-            throw new EntityNotFoundException ("Informations manquantes");
+    public ResponseEntity<?> createSubscription(SubscriptionRequest subscriptionRequest) {
+        User user = profileService.getAuthenticatedUser();
+        VisitorProfile visitorProfile = user.getVisitorProfile();
+        if (visitorProfile == null) {
+            throw new ForbiddenException("Only visitors can subscribe to events.");
         }
 
+        Event event = eventRepository.findById(subscriptionRequest.getId_event())
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        TicketCategory ticketCategory = ticketCategoryRepository.findById(subscriptionRequest.getId_ticket())
+                .orElseThrow(() -> new EntityNotFoundException("Ticket category not found"));
 
         Subscription subscription = new Subscription();
-        String codeticket = subscription.generateTicketCode();
+        String codeticket;
+        do {
+            codeticket = subscription.generateTicketCode();
+        } while (subscriptionRepository.existsByCodeticket(codeticket));
 
         subscription.setCreatedAt(LocalDateTime.now());
         subscription.setPlaces(subscriptionRequest.getPlaces());
-        subscription.setVisitor(visitor);
+        subscription.setVisitorProfile(visitorProfile);
         subscription.setEvent(event);
         subscription.setTicket(ticketCategory);
-        do {
-            codeticket = subscription.generateTicketCode();
-        } while(subscriptionRepository.existsByCodeticket(codeticket));
-
         subscription.setCodeticket(codeticket);
+        subscription.setMontant(subscriptionRequest.getPlaces() * ticketCategory.getPrix());
+        subscription.setStatut(Statut_Subscription.REUSSI); // Assuming success for now
 
-
-        //Calcul du montant total
-       int  montant = subscriptionRequest.getPlaces() * ticketCategory.getPrix();
-       subscription.setMontant(montant);
-
-        //liaison dans les deux sens
-        visitor.getSubscriptionList().add(subscription);
-        event.getSubscriptionList().add(subscription);
-        ticketCategory.getSubscriptions().add(subscription);
         subscriptionRepository.save(subscription);
-        eventRepository.save(event);
-        visitorRepository.save(visitor);
-        ticketCategoryRepository.save(ticketCategory);
 
-        //Envoie du ticket
-        /* emailSenderService.sendEmail(
-                visitor.getEmail(),"Ticket de Confirmation pour l'Évènement "+event.getTitle(),
-                "Merci pour votre enregistrement: Evenement "+event.getTitle()+" - Visiteur : "+visitor.getName()+" "+visitor.getName()
-                        +" - Nombre de places : "+subscription.getPlaces()+" - Montant Total : "+ subscription.getMontant()
-                        +" - Code Ticket : "+subscription.getCodeticket());*/
+        // Send confirmation email
+        emailSenderService.sendEmail(
+                user.getEmail(),
+                "Ticket Confirmation for Event: " + event.getTitle(),
+                "Thank you for your registration for " + event.getTitle() + ".\n" +
+                        "Visitor: " + visitorProfile.getName() + " " + visitorProfile.getSurname() + "\n" +
+                        "Number of places: " + subscription.getPlaces() + "\n" +
+                        "Total Amount: " + subscription.getMontant() + " CFA\n" +
+                        "Your Ticket Code: " + subscription.getCodeticket()
+        );
 
-        SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
-
-       return ResponseEntity.ok(subscriptionResponse);
-
-    }
-
-    public ResponseEntity<?> findSubsription(Long id){
-        Subscription subscription = subscriptionRepository.findById(id).orElse(null);
-
-        if(subscription == null){
-            throw new EntityNotFoundException("Souscription Introuvable");
-        }
         SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
         return ResponseEntity.ok(subscriptionResponse);
     }
 
-    public ResponseEntity<?>  getAllSubscription(){
+    public ResponseEntity<?> findSubsription(Long id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
+        SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
+        return ResponseEntity.ok(subscriptionResponse);
+    }
 
+    public ResponseEntity<?> getAllSubscription() {
         List<Subscription> subscriptions = subscriptionRepository.findAll();
-        List<SubscriptionResponse> subscriptionResponses= new ArrayList<>();
-
-        for(Subscription subscription : subscriptions) {
-            SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
-            subscriptionResponses.add(subscriptionResponse);
-        }
+        List<SubscriptionResponse> subscriptionResponses = subscriptions.stream()
+                .map(UtilSubscription::convertToSubscriptionResponse)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(subscriptionResponses);
     }
 
-    public ResponseEntity<?> deleteSubscription(Long id){
-        Subscription subscription = subscriptionRepository.findById(id).orElse(null);
-        if(subscription == null){
-            throw new EntityNotFoundException(" Souscription Introuvable");
+    public ResponseEntity<?> deleteSubscription(Long id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
+
+        User user = profileService.getAuthenticatedUser();
+        if (!subscription.getVisitorProfile().getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("You can only delete your own subscriptions.");
         }
-        return ResponseEntity.ok("Suppression reussie !");
+
+        subscriptionRepository.delete(subscription);
+        return ResponseEntity.ok("Subscription deleted successfully!");
     }
 
     public ResponseEntity<?> getSubscriptionsByVisitor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String visitorEmail = authentication.getName();
-
-        Visitor visitor = visitorRepository.findByEmail(visitorEmail)
-                .orElseThrow(() -> new EntityNotFoundException("Visitor not found with email: " + visitorEmail));
-
-        List<Subscription> subscriptions = visitor.getSubscriptionList();
-        List<SubscriptionResponse> subscriptionResponses = new ArrayList<>();
-        for(Subscription subscription : subscriptions) {
-            SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
-            subscriptionResponses.add(subscriptionResponse);
+        User user = profileService.getAuthenticatedUser();
+        VisitorProfile visitorProfile = user.getVisitorProfile();
+        if (visitorProfile == null) {
+            throw new ForbiddenException("User is not a visitor.");
         }
+
+        List<SubscriptionResponse> subscriptionResponses = visitorProfile.getSubscriptionList().stream()
+                .map(UtilSubscription::convertToSubscriptionResponse)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(subscriptionResponses);
     }
 
@@ -139,7 +121,6 @@ public class SubscriptionService {
         List<SubscriptionResponse> subscriptionResponses = event.getSubscriptionList().stream()
                 .map(UtilSubscription::convertToSubscriptionResponse)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(subscriptionResponses);
     }
 }

@@ -13,7 +13,7 @@ public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     private int montant;
     private int places;
     private LocalDateTime createdAt;
@@ -26,9 +26,9 @@ public class Subscription {
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name = "visitor_id")
+    @JoinColumn(name = "visitor_profile_id")
     @JsonBackReference
-    private Visitor visitor;
+    private VisitorProfile visitorProfile;
 
     @ManyToOne
     @JoinColumn(name = "ticket_id")
