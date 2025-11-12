@@ -20,3 +20,7 @@ export const getSubscriptionsByUser = async () => {
 export const getSubscriptionsByEvent = async (id: string) => {
   return axios.get(`${API_URL}/event/${id}`);
 };
+
+export const deleteSubscription = async (id: number) => {
+  return axios.delete(`${API_URL}/${id}`);
+};

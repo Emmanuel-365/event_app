@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getSubscriptionsByUser } from '../services/subscriptionService';
+import { getSubscriptionsByUser, deleteSubscription } from '../services/subscriptionService';
 
 interface Subscription {
   id: number;
@@ -35,6 +35,18 @@ const MySubscriptions: React.FC = () => {
     fetchSubscriptions();
   }, []);
 
+  const handleDelete = async (subscriptionId: number) => {
+    if (window.confirm('Are you sure you want to cancel this subscription?')) {
+      try {
+        await deleteSubscription(subscriptionId);
+        setSubscriptions(subscriptions.filter(sub => sub.id !== subscriptionId));
+      } catch (err) {
+        setError('Failed to cancel the subscription.');
+        console.error(err);
+      }
+    }
+  };
+
   if (loading) {
     return <div className="text-center p-8 text-gray-500 dark:text-gray-400">Loading your subscriptions...</div>;
   }
@@ -64,10 +76,13 @@ const MySubscriptions: React.FC = () => {
                   Ticket: <span className="font-semibold">{sub.nom_ticket}</span> | Places: <span className="font-semibold">{sub.places}</span>
                 </p>
               </div>
-              <div className="flex-shrink-0">
-                <Link to={`/event/${sub.event_id}`} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <div className="flex-shrink-0 flex space-x-2">
+                <Link to={`/event/${sub.event_id}`} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
                   View Event
                 </Link>
+                <button onClick={() => handleDelete(sub.id)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
+                  Cancel Subscription
+                </button>
               </div>
             </div>
           ))}

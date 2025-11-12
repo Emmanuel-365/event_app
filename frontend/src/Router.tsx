@@ -14,6 +14,8 @@ import MySubscriptions from './pages/MySubscriptions';
 import EventSubscribers from './pages/EventSubscribers';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Dashboard from "./pages/Dashboard.tsx";
+import EventStats from "./pages/EventStats.tsx";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +59,22 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+        {
+            path: '/dashboard',
+            element: (
+                <ProtectedRoute role="ORGANIZER">
+                    <Dashboard />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: '/event-stats/:id',
+            element: (
+                <ProtectedRoute role="ORGANIZER">
+                    <EventStats />
+                </ProtectedRoute>
+            ),
+        },
       {
         path: '/my-subscriptions',
         element: (

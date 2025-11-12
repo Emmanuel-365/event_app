@@ -4,9 +4,24 @@ import { getVisitorMe, getOrganizerMe } from '../services/authService';
 import { updateVisitor } from '../services/visitorService';
 import { updateOrganizer } from '../services/organizerService';
 
+interface ProfileData {
+  email: string;
+  phone: string;
+  name: string;
+  // Visitor specific
+  surname?: string;
+  city?: string;
+  // Organizer specific
+  annee_activite?: string;
+  instagram_url?: string;
+  facebook_url?: string;
+  whatsapp_url?: string;
+  profil_url?: string;
+}
+
 const Profile: React.FC = () => {
   const { user, login } = useAuth();
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');

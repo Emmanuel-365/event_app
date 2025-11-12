@@ -2,9 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getAllMembers, createMember, updateMember, deleteMember } from '../services/memberService';
 
+interface Member {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    role: string;
+}
+
 const MemberManagement: React.FC = () => {
   const { user } = useAuth();
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [listError, setListError] = useState('');
   const [formMessage, setFormMessage] = useState('');
   const [formError, setFormError] = useState('');
@@ -18,7 +26,7 @@ const MemberManagement: React.FC = () => {
   });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<any | null>(null);
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [newRole, setNewRole] = useState('');
 
   const fetchMembers = async () => {
@@ -62,7 +70,7 @@ const MemberManagement: React.FC = () => {
     }
   };
 
-  const openEditModal = (member: any) => {
+  const openEditModal = (member: Member) => {
     setEditingMember(member);
     setNewRole(member.role);
     setIsEditModalOpen(true);
@@ -71,7 +79,7 @@ const MemberManagement: React.FC = () => {
   const handleUpdateMember = async () => {
     if (!editingMember) return;
     try {
-      await updateMember(editingMember.id, { ...editingMember, role: newRole });
+      await updateMember(editingMember.id, { role: newRole });
       fetchMembers();
       setIsEditModalOpen(false);
       setEditingMember(null);

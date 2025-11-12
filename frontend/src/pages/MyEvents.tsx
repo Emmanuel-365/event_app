@@ -86,6 +86,7 @@ const MyEvents: React.FC = () => {
                     <Link to={`/edit-event/${event.id}`} className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</Link>
                     <button onClick={() => handleDelete(event.id)} className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Delete</button>
                     <Link to={`/event-subscribers/${event.id}`} className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Subscribers</Link>
+                    <Link to={`/event-stats/${event.id}`} className="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Stats</Link>
                   </div>
                 </div>
               </li>

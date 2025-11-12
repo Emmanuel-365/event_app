@@ -4,10 +4,29 @@ import { getEventById } from '../services/eventService';
 import { useAuth } from '../context/AuthContext';
 import { createSubscription } from '../services/subscriptionService';
 
+interface TicketCategory {
+  id: number;
+  intitule: string;
+  prix: number;
+}
+
+interface EventDetailsData {
+  id: number;
+  title: string;
+  description: string;
+  lieu: string;
+  debut: string;
+  fin: string;
+  places: number;
+  organizer_name: string;
+  profil_url: string;
+  ticketCategoryList: TicketCategory[];
+}
+
 const EventDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [event, setEvent] = useState<any>(null);
+  const [event, setEvent] = useState<EventDetailsData | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -105,7 +124,7 @@ const EventDetails: React.FC = () => {
                     required
                   >
                     <option value="">Select a ticket</option>
-                    {event.ticketCategoryList && event.ticketCategoryList.map((ticket: any) => (
+                    {event.ticketCategoryList && event.ticketCategoryList.map((ticket: TicketCategory) => (
                       <option key={ticket.id} value={ticket.id}>
                         {ticket.intitule} - {ticket.prix} CFA
                       </option>
