@@ -94,7 +94,7 @@ const Profile: React.FC = () => {
           </div>
 
           {/* Visitor Fields */}
-          {user?.role === 'VISITOR' && (
+          {user?.role === 'ROLE_VISITOR' && (
             <>
               <div>
                 <label htmlFor="name" className={labelStyle}>Name</label>
@@ -112,7 +112,7 @@ const Profile: React.FC = () => {
           )}
 
           {/* Organizer Fields */}
-          {user?.role === 'ORGANIZER' && (
+          {user?.role === 'ROLE_ORGANIZER' && (
             <>
               <div>
                 <label htmlFor="name" className={labelStyle}>Organizer Name</label>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login as loginService, getVisitorMe, getOrganizerMe } from '../services/authService';
+import { login as loginService, getMe } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
@@ -22,28 +22,16 @@ const Login: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const loginResponse = await loginService(formData);
-      const redirectUrl = loginResponse.request.responseURL;
-      let role = '';
-
-      if (redirectUrl.includes('organizer')) {
-        role = 'ORGANIZER';
-      } else if (redirectUrl.includes('visitor')) {
-        role = 'VISITOR';
-      }
-
-      if (role) {
-        let userResponse;
-        if (role === 'ORGANIZER') {
-          userResponse = await getOrganizerMe();
-        } else {
-          userResponse = await getVisitorMe();
-        }
-
-        login({ ...userResponse.data, role: role });
+      await loginService(formData);
+      const userResponse = await getMe();
+      
+      // The backend now sends profile data, which contains the user object
+      const user = userResponse.data.user;
+      if (user && user.role) {
+        login({ id: user.id, email: user.email, role: user.role });
         navigate('/');
       } else {
-        setError('Could not determine user role.');
+        setError('Could not retrieve user details after login.');
       }
 
     } catch (err) {
@@ -107,7 +95,7 @@ const Login: React.FC = () => {
             </button>
           </div>
           <div className="text-sm text-center">
-            <Link to="/register-visitor" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+            <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
               Don't have an account? Register
             </Link>
           </div>

@@ -29,7 +29,7 @@ function App() {
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
                   <Link className="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/">Home</Link>
-                  {user?.role === 'ORGANIZER' && (
+                  {user?.role === 'ROLE_ORGANIZER' && (
                     <>
                       <Link className="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/dashboard">Dashboard</Link>
                       <Link className="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/create-event">Create Event</Link>
@@ -37,7 +37,7 @@ function App() {
                       <Link className="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/member-management">Manage Members</Link>
                     </>
                   )}
-                  {user?.role === 'VISITOR' && (
+                  {user?.role === 'ROLE_VISITOR' && (
                     <Link className="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/my-subscriptions">My Subscriptions</Link>
                   )}
                 </div>
@@ -86,7 +86,7 @@ function App() {
           <div className="md:hidden" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <Link to="/" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Home</Link>
-              {user?.role === 'ORGANIZER' && (
+              {user?.role === 'ROLE_ORGANIZER' && (
                 <>
                   <Link to="/dashboard" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
                   <Link to="/create-event" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Create Event</Link>
@@ -94,7 +94,7 @@ function App() {
                   <Link to="/member-management" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Manage Members</Link>
                 </>
               )}
-              {user?.role === 'VISITOR' && (
+              {user?.role === 'ROLE_VISITOR' && (
                 <Link to="/my-subscriptions" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Subscriptions</Link>
               )}
             </div>
@@ -107,7 +107,7 @@ function App() {
               ) : (
                 <div className="px-2 space-y-1">
                   <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Login</Link>
-                  <Link to="/register-visitor" className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Register</Link>
+                  <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Register</Link>
                 </div>
               )}
             </div>

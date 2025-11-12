@@ -2,8 +2,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import RegisterVisitor from './pages/RegisterVisitor';
-import RegisterOrganizer from './pages/RegisterOrganizer';
 import CreateEvent from './pages/CreateEvent';
 import EventDetails from './pages/EventDetails';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -25,12 +23,10 @@ const router = createBrowserRouter([
       { path: '/', element: <ProtectedRoute><Home /></ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
-      { path: '/register-visitor', element: <RegisterVisitor /> },
-      { path: '/register-organizer', element: <RegisterOrganizer /> },
       {
         path: '/create-event',
         element: (
-          <ProtectedRoute role="ORGANIZER">
+          <ProtectedRoute role="ROLE_ORGANIZER">
             <CreateEvent />
           </ProtectedRoute>
         ),
@@ -38,7 +34,7 @@ const router = createBrowserRouter([
       {
         path: '/member-management',
         element: (
-          <ProtectedRoute role="ORGANIZER">
+          <ProtectedRoute role="ROLE_ORGANIZER">
             <MemberManagement />
           </ProtectedRoute>
         ),
@@ -46,7 +42,7 @@ const router = createBrowserRouter([
       {
         path: '/my-events',
         element: (
-          <ProtectedRoute role="ORGANIZER">
+          <ProtectedRoute role="ROLE_ORGANIZER">
             <MyEvents />
           </ProtectedRoute>
         ),
@@ -54,7 +50,7 @@ const router = createBrowserRouter([
       {
         path: '/edit-event/:id',
         element: (
-          <ProtectedRoute role="ORGANIZER">
+          <ProtectedRoute role="ROLE_ORGANIZER">
             <EditEvent />
           </ProtectedRoute>
         ),
@@ -62,7 +58,7 @@ const router = createBrowserRouter([
         {
             path: '/dashboard',
             element: (
-                <ProtectedRoute role="ORGANIZER">
+                <ProtectedRoute role="ROLE_ORGANIZER">
                     <Dashboard />
                 </ProtectedRoute>
             ),
@@ -70,7 +66,7 @@ const router = createBrowserRouter([
         {
             path: '/event-stats/:id',
             element: (
-                <ProtectedRoute role="ORGANIZER">
+                <ProtectedRoute role="ROLE_ORGANIZER">
                     <EventStats />
                 </ProtectedRoute>
             ),
@@ -86,7 +82,7 @@ const router = createBrowserRouter([
       {
         path: '/event-subscribers/:id',
         element: (
-          <ProtectedRoute role="ORGANIZER">
+          <ProtectedRoute role="ROLE_ORGANIZER">
             <EventSubscribers />
           </ProtectedRoute>
         ),
