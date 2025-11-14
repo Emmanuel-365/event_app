@@ -108,7 +108,7 @@ const EventDetails: React.FC = () => {
             <p><strong>Available places:</strong> {event.places}</p>
             <p><strong>Organizer:</strong> {event.organizer_name}</p>
           </div>
-          {user && user.role === 'VISITOR' && (
+          {user && user.role === 'ROLE_VISITOR' && (
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               <h2 className="font-bold text-lg mb-2">Subscribe to this Event</h2>
               <form onSubmit={handleSubscription} className="space-y-4">

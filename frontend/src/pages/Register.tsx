@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { register, RegisterData } from '../services/authService';
+import { register, type RegisterData } from '../services/authService';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<Partial<RegisterData>>({

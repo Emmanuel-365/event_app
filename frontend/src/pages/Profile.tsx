@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getVisitorMe, getOrganizerMe } from '../services/authService';
+import { getMe } from '../services/authService';
 import { updateVisitor } from '../services/visitorService';
 import { updateOrganizer } from '../services/organizerService';
 
@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       if (!user) return;
       try {
-        const response = user.role === 'VISITOR' ? await getVisitorMe() : await getOrganizerMe();
+        const response = await getMe();
         setProfileData(response.data);
       } catch (err) {
         setError('Could not fetch profile data.');
@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+    setProfileData({ ...profileData as ProfileData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +54,7 @@ const Profile: React.FC = () => {
     setMessage('');
     try {
       let updatedData;
-      if (user.role === 'VISITOR') {
+      if (user.role === 'ROLE_VISITOR') {
         updatedData = await updateVisitor(user.id, profileData);
       } else {
         updatedData = await updateOrganizer(user.id, profileData);
