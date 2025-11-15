@@ -70,15 +70,10 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
-                            // Redirection based on role
-                            String role = authentication.getAuthorities().iterator().next().getAuthority();
-                            if (role.equals("ROLE_ORGANIZER")) {
-                                response.sendRedirect("/api/profile/me"); // Redirect to a unified profile endpoint
-                            } else if (role.equals("ROLE_VISITOR")) {
-                                response.sendRedirect("/api/profile/me"); // Redirect to a unified profile endpoint
-                            } else {
-                                response.sendRedirect("/"); // fallback
-                            }
+                            response.setStatus(200);
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(401);
                         })
                         .permitAll()
                 )
