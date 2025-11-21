@@ -32,6 +32,7 @@ public class Subscription {
 
     @ManyToOne
     @JoinColumn(name = "ticket_id")
+    @JsonBackReference
     private TicketCategory ticket;
     //ticket
     private String codeticket;

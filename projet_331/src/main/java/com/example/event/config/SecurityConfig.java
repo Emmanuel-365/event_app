@@ -60,11 +60,11 @@ public class SecurityConfig {
                         .requestMatchers("/member/**").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers("/ticket/**").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers("/image/**").hasAuthority("ROLE_ORGANIZER")
-                        .requestMatchers("/api/stats/**").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers(HttpMethod.POST, "/subscription").hasAuthority("ROLE_VISITOR")
                         .requestMatchers(HttpMethod.GET, "/subscription/visitor/me").hasAuthority("ROLE_VISITOR")
                         .requestMatchers(HttpMethod.GET, "/subscription/event/**").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers("/api/profile/me").authenticated()
+                        .requestMatchers("/api/stats/recommendation").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

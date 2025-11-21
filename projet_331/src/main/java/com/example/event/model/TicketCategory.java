@@ -1,5 +1,6 @@
 package com.example.event.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class TicketCategory {
 
     @ManyToOne
     @JoinColumn(name = "event_id")
+    @JsonBackReference
     private Event event;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticket")
