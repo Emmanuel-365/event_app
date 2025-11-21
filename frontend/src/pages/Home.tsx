@@ -3,7 +3,6 @@ import { getAllEvents } from '../services/eventService';
 import { getTrendingEvents, getBestOrganizerRecommendations } from '../services/statsService';
 import EventCard from '../components/EventCard';
 
-// Define a type for the event object for better type safety
 interface Event {
   id: number;
   title: string;
@@ -15,6 +14,19 @@ interface Event {
   organizer_name: string;
   profil_url: string;
 }
+
+const SkeletonCard = () => (
+    <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg overflow-hidden border border-neutral-200 dark:border-neutral-700 animate-pulse">
+      <div className="w-full h-48 bg-neutral-300 dark:bg-neutral-700"></div>
+      <div className="p-4">
+        <div className="h-4 bg-neutral-300 dark:bg-neutral-700 rounded w-1/4 mb-2"></div>
+        <div className="h-6 bg-neutral-300 dark:bg-neutral-700 rounded w-3/4 mb-2"></div>
+        <div className="h-12 bg-neutral-300 dark:bg-neutral-700 rounded mb-4"></div>
+        <div className="h-4 bg-neutral-300 dark:bg-neutral-700 rounded w-1/2 mb-4"></div>
+        <div className="h-10 bg-neutral-300 dark:bg-neutral-700 rounded-lg"></div>
+      </div>
+    </div>
+);
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -58,37 +70,50 @@ const Home: React.FC = () => {
     fetchAllData();
   }, []);
 
-  const renderEventSection = (title: string, eventList: Event[]) => (
-    <div className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{title}</h2>
-      {eventList.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  const renderEventSection = (title: string, eventList: Event[], isLoading: boolean) => (
+    <div className="mb-16">
+      <h2 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100 mb-6">{title}</h2>
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      ) : eventList.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {eventList.map(event => (
             <EventCard event={event} key={event.id} />
           ))}
         </div>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400">No events found for this category.</p>
+        <div className="text-center py-10 px-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+            <p className="text-neutral-500 dark:text-neutral-400">No events found for this category at the moment.</p>
+        </div>
       )}
     </div>
   );
 
   return (
-    <div>
+    <div className="space-y-12">
+        <div className="text-center py-16">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100">
+                Find Your Next <span className="text-primary-600">Experience</span>
+            </h1>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-neutral-600 dark:text-neutral-400">
+                Discover, book, and enjoy unforgettable events happening near you.
+            </p>
+        </div>
+
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-          {error}
+        <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-6" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span>{error}</span>
         </div>
       )}
-      {loading ? (
-        <p className="text-gray-500 dark:text-gray-400">Loading events...</p>
-      ) : (
-        <>
-          {renderEventSection("Trending Events", trendingEvents)}
-          {renderEventSection("Recommendations from Best Organizers", recommendedEvents)}
-          {renderEventSection("Upcoming Events", events)}
-        </>
-      )}
+      
+      <>
+        {renderEventSection("Trending Events", trendingEvents, loading)}
+        {renderEventSection("From Top Organizers", recommendedEvents, loading)}
+        {renderEventSection("All Upcoming Events", events, loading)}
+      </>
     </div>
   );
 };
