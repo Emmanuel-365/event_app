@@ -1,3 +1,5 @@
+package com.example.event.service;
+
 import com.example.event.Exception.EntityAlreadyExistException;
 import com.example.event.Exception.ForbiddenException;
 import com.example.event.Exception.EntityNotFoundException;
@@ -12,6 +14,7 @@ import com.example.event.utils.QRCodeGenerator;
 import com.example.event.utils.UtilSubscription;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,7 @@ public class SubscriptionService {
     private final EmailSenderService emailSenderService;
 
     @Transactional
-    public ResponseEntity<?> createSubscription(SubscriptionRequest subscriptionRequest) {
+    public ResponseEntity<SubscriptionResponse> createSubscription(SubscriptionRequest subscriptionRequest) {
         User user = profileService.getAuthenticatedUser();
         VisitorProfile visitorProfile = user.getVisitorProfile();
         if (visitorProfile == null) {
@@ -65,36 +68,69 @@ public class SubscriptionService {
         subscription.setTicket(ticketCategory);
         subscription.setCodeticket(codeticket);
         subscription.setMontant(subscriptionRequest.getPlaces() * ticketCategory.getPrix());
-        subscription.setStatut(Statut_Subscription.REUSSI); // Assuming success for now
+        
+        boolean isPaidTicket = ticketCategory.getPrix() > 0;
+        
+        if (isPaidTicket) {
+            subscription.setStatut(Statut_Subscription.EN_ATTENTE);
+        } else {
+            subscription.setStatut(Statut_Subscription.REUSSI);
+        }
 
-        subscriptionRepository.save(subscription);
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
         eventRepository.save(event);
+        
+        if (!isPaidTicket) {
+            sendTicketEmail(savedSubscription);
+        }
 
-        // Send confirmation email with QR Code
+        SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(savedSubscription);
+        
+        if (isPaidTicket) {
+            return new ResponseEntity<>(subscriptionResponse, HttpStatus.CREATED); // 201 for payment pending
+        } else {
+            return ResponseEntity.ok(subscriptionResponse); // 200 for free ticket
+        }
+    }
+
+    @Transactional
+    public SubscriptionResponse confirmPayment(Long subscriptionId) {
+        Subscription subscription = subscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
+
+        if(subscription.getStatut() != Statut_Subscription.EN_ATTENTE) {
+            throw new ForbiddenException("This subscription is not pending payment.");
+        }
+
+        subscription.setStatut(Statut_Subscription.REUSSI);
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
+
+        sendTicketEmail(savedSubscription);
+
+        return UtilSubscription.convertToSubscriptionResponse(savedSubscription);
+    }
+    
+    private void sendTicketEmail(Subscription subscription) {
         try {
+            User user = subscription.getVisitorProfile().getUser();
             byte[] qrCode = QRCodeGenerator.generateQRCodeImage(subscription.getCodeticket(), 250, 250);
-            String emailBody = "Thank you for your registration for " + event.getTitle() + ".\n" +
-                               "Visitor: " + visitorProfile.getName() + " " + visitorProfile.getSurname() + "\n" +
+            String emailBody = "Thank you for your registration for " + subscription.getEvent().getTitle() + ".\n" +
+                               "Visitor: " + subscription.getVisitorProfile().getName() + " " + subscription.getVisitorProfile().getSurname() + "\n" +
                                "Number of places: " + subscription.getPlaces() + "\n" +
                                "Total Amount: " + subscription.getMontant() + " CFA\n" +
                                "Your Ticket Code: " + subscription.getCodeticket();
 
             emailSenderService.sendEmailWithQRCode(
                     user.getEmail(),
-                    "Ticket Confirmation for Event: " + event.getTitle(),
+                    "Ticket Confirmation for Event: " + subscription.getEvent().getTitle(),
                     emailBody,
                     qrCode
             );
         } catch (WriterException | IOException e) {
-            // Log the error but don't block the user response
-            System.err.println("Failed to generate or send QR code email: " + e.getMessage());
-            // Optionally, send a simple email as a fallback
-            // emailSenderService.sendEmail(user.getEmail(), "Ticket Confirmation...", "Your ticket code is " + subscription.getCodeticket());
+            System.err.println("Failed to generate or send QR code email for subscription " + subscription.getId() + ": " + e.getMessage());
         }
-
-        SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
-        return ResponseEntity.ok(subscriptionResponse);
     }
+    
      @Transactional(readOnly = true)
     public ResponseEntity<?> findSubsription(Long id) {
         Subscription subscription = subscriptionRepository.findById(id)

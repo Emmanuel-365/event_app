@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getEventById } from '../services/eventService';
 import { useAuth } from '../context/AuthContext';
 import { createSubscription } from '../services/subscriptionService';
@@ -32,6 +32,7 @@ interface EventDetailsData {
 const EventDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [event, setEvent] = useState<EventDetailsData | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -78,10 +79,16 @@ const EventDetails: React.FC = () => {
         id_ticket: parseInt(selectedTicket, 10),
         places: quantity,
       };
-      await createSubscription(subscriptionData);
-      setMessage('Subscription successful! A confirmation has been sent to your email.');
-    } catch (err) {
-      setError('Subscription failed. The ticket may be sold out or an error occurred.');
+      const response = await createSubscription(subscriptionData);
+      
+      if (response.status === 201) { // 201 Created: Payment is pending
+        navigate(`/payment/${response.data.id}`, { state: { amount: response.data.montant } });
+      } else { // 200 OK: Free ticket, subscription is successful immediately
+        setMessage('Subscription for free event successful! A confirmation has been sent to your email.');
+      }
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Subscription failed. The ticket may be sold out or an error occurred.');
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -207,5 +214,3 @@ const EventDetails: React.FC = () => {
     </div>
   );
 };
-
-export default EventDetails;

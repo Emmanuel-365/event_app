@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import Dashboard from "./pages/Dashboard.tsx";
 import EventStats from "./pages/EventStats.tsx";
 import TicketScanner from "./pages/TicketScanner.tsx";
+import PaymentSimulation from "./pages/PaymentSimulation.tsx";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +86,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MySubscriptions />
+          </ProtectedRoute>
+        ),
+      },
+       {
+        path: '/payment/:subscriptionId',
+        element: (
+          <ProtectedRoute role="ROLE_VISITOR">
+            <PaymentSimulation />
           </ProtectedRoute>
         ),
       },

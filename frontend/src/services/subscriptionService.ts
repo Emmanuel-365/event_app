@@ -28,3 +28,7 @@ export const deleteSubscription = async (id: number) => {
 export const validateTicket = async (ticketCode: string) => {
   return axios.post(`${API_URL}/validate/${ticketCode}`);
 };
+
+export const confirmPayment = async (subscriptionId: number) => {
+    return axios.post(`${API_URL}/${subscriptionId}/confirm-payment`);
+};

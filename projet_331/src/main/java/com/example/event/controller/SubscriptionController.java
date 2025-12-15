@@ -49,4 +49,10 @@ public class SubscriptionController {
         SubscriptionResponse response = subscriptionService.validateTicket(ticketCode);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}/confirm-payment")
+    public ResponseEntity<SubscriptionResponse> confirmPayment(@PathVariable Long id) {
+        SubscriptionResponse response = subscriptionService.confirmPayment(id);
+        return ResponseEntity.ok(response);
+    }
 }
