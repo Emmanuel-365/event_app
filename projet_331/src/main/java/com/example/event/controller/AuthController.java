@@ -1,6 +1,8 @@
 package com.example.event.controller;
 
+import com.example.event.dto.auth.ForgotPasswordRequest;
 import com.example.event.dto.auth.RegisterRequest;
+import com.example.event.dto.auth.ResetPasswordRequest;
 import com.example.event.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +22,17 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.initiatePasswordReset(request.getEmail());
+        return ResponseEntity.ok("Password reset link sent to your email.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Password has been reset successfully.");
     }
 }

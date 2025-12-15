@@ -90,6 +90,11 @@ const Login: React.FC = () => {
                 onChange={handleChange}
               />
             </div>
+            <div className="text-sm text-right">
+                <Link to="/forgot-password" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
+                    Forgot your password?
+                </Link>
+            </div>
           </div>
 
           <div>

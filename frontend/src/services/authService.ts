@@ -47,3 +47,12 @@ export const register = async (data: RegisterData) => {
 export const getMe = async () => {
   return axios.get(`${API_URL}/api/profile/me`);
 };
+
+export const forgotPassword = async (email: string) => {
+  return axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  return axios.post(`${API_URL}/api/auth/reset-password`, { token, newPassword });
+};
+

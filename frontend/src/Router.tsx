@@ -17,6 +17,8 @@ import EventStats from "./pages/EventStats.tsx";
 import TicketScanner from "./pages/TicketScanner.tsx";
 import PaymentSimulation from "./pages/PaymentSimulation.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import ForgotPassword from "./pages/ForgotPassword.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,8 @@ const router = createBrowserRouter([
       { path: '/', element: <ProtectedRoute><Home /></ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/reset-password', element: <ResetPassword /> },
       {
         path: '/create-event',
         element: (

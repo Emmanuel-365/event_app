@@ -1,17 +1,21 @@
 package com.example.event.service;
 
 import com.example.event.Exception.EntityAlreadyExistException;
+import com.example.event.Exception.EntityNotFoundException;
+import com.example.event.Exception.ForbiddenException;
 import com.example.event.dto.auth.RegisterRequest;
 import com.example.event.model.*;
 import com.example.event.repository.OrganizerProfileRepository;
+import com.example.event.repository.PasswordResetTokenRepository;
 import com.example.event.repository.UserRepository;
-import com.example.event.repository.VisitorProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,8 @@ public class AuthService {
     private final VisitorProfileRepository visitorProfileRepository;
     private final OrganizerProfileRepository organizerProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailSenderService emailSenderService;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -56,5 +62,43 @@ public class AuthService {
         }
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void initiatePasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
+
+        // Delete any existing tokens for this user
+        passwordResetTokenRepository.deleteByUser(user);
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken(token, user);
+        passwordResetTokenRepository.save(resetToken);
+
+        String resetLink = "http://localhost:5173/reset-password?token=" + token; // Frontend URL
+        emailSenderService.sendEmail(
+                user.getEmail(),
+                "Password Reset Request",
+                "To reset your password, click on the following link: " + resetLink +
+                "\n\nThis link will expire in 24 hours."
+        );
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new EntityNotFoundException("Invalid or expired password reset token."));
+
+        if (resetToken.isExpired()) {
+            passwordResetTokenRepository.delete(resetToken); // Clean up expired token
+            throw new ForbiddenException("Password reset token has expired.");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken); // Invalidate token after use
     }
 }

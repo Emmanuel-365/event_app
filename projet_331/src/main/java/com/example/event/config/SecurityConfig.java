@@ -53,6 +53,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
                         .requestMatchers(HttpMethod.GET, "/event", "/event/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/event").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers(HttpMethod.PUT, "/event/**").hasAuthority("ROLE_ORGANIZER")
