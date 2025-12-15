@@ -29,7 +29,7 @@ interface EventDetailsData {
   images: Image[];
 }
 
-const EventDetails: React.FC = () => {
+export const EventDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();

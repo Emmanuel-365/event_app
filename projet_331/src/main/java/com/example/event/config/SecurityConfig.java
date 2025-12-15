@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/subscription/validate/**").hasAuthority("ROLE_ORGANIZER")
                         .requestMatchers("/api/profile/me").authenticated()
                         .requestMatchers("/api/stats/recommendation").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN") // New admin rule
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

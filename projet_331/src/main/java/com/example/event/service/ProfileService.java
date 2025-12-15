@@ -1,11 +1,16 @@
 package com.example.event.service;
 
 import com.example.event.Exception.EntityNotFoundException;
+import com.example.event.Exception.ForbiddenException;
 import com.example.event.model.User;
+import com.example.event.model.UserRole;
 import com.example.event.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +33,37 @@ public class ProfileService {
         }
         throw new IllegalStateException("User has no valid profile role");
     }
-    
-    // The update logic will be more complex and will be added later.
-    // For now, the focus is on getting the structure right.
+
+    // Admin-specific methods
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Transactional
+    public User updateUserRole(Long userId, UserRole newRole) {
+        User authenticatedUser = getAuthenticatedUser();
+        if (authenticatedUser.getId().equals(userId)) {
+            throw new ForbiddenException("An administrator cannot change their own role.");
+        }
+
+        User userToUpdate = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        userToUpdate.setRole(newRole);
+        return userRepository.save(userToUpdate);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User authenticatedUser = getAuthenticatedUser();
+        if (authenticatedUser.getId().equals(userId)) {
+            throw new ForbiddenException("An administrator cannot delete their own account.");
+        }
+
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with ID: " + userId);
+        }
+        userRepository.deleteById(userId);
+    }
 }

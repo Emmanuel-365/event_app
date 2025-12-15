@@ -71,6 +71,9 @@ function App() {
                   {user?.role === 'ROLE_VISITOR' && (
                     <NavLink to="/my-subscriptions">My Subscriptions</NavLink>
                   )}
+                  {user?.role === 'ROLE_ADMIN' && (
+                    <NavLink to="/admin/dashboard">Admin Dashboard</NavLink>
+                  )}
                 </div>
               </div>
             </div>
@@ -134,12 +137,16 @@ function App() {
                   <MobileNavLink to="/my-events" onClick={closeMobileMenu}>My Events</MobileNavLink>
                   <MobileNavLink to="/member-management" onClick={closeMobileMenu}>Manage Members</MobileNavLink>
                 </>
-              )}
-              {user?.role === 'ROLE_VISITOR' && (
-                <MobileNavLink to="/my-subscriptions" onClick={closeMobileMenu}>My Subscriptions</MobileNavLink>
-              )}
-            </div>
-            <div className="pt-4 pb-3 border-t border-neutral-700">
+                                )}
+                                {user?.role === 'ROLE_ADMIN' && (
+                                  <MobileNavLink to="/admin/dashboard" onClick={closeMobileMenu}>Admin Dashboard</MobileNavLink>
+                                )}
+                              </>
+                            )}
+                            {user?.role === 'ROLE_VISITOR' && (
+                              <MobileNavLink to="/my-subscriptions" onClick={closeMobileMenu}>My Subscriptions</MobileNavLink>
+                            )}
+                          </div>            <div className="pt-4 pb-3 border-t border-neutral-700">
               {user ? (
                 <div className="px-2 space-y-1">
                   <MobileNavLink to="/profile" onClick={closeMobileMenu}>My Profile</MobileNavLink>

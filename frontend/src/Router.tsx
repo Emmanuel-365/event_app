@@ -3,7 +3,7 @@ import App from './App';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import CreateEvent from './pages/CreateEvent';
-import EventDetails from './pages/EventDetails';
+import { EventDetails } from './pages/EventDetails';
 import ProtectedRoute from './components/ProtectedRoute';
 import MemberManagement from './pages/MemberManagement';
 import MyEvents from './pages/MyEvents';
@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import EventStats from "./pages/EventStats.tsx";
 import TicketScanner from "./pages/TicketScanner.tsx";
 import PaymentSimulation from "./pages/PaymentSimulation.tsx";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -78,6 +79,14 @@ const router = createBrowserRouter([
             element: (
                 <ProtectedRoute role="ROLE_ORGANIZER">
                     <TicketScanner />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: '/admin/dashboard',
+            element: (
+                <ProtectedRoute role="ROLE_ADMIN">
+                    <AdminDashboard />
                 </ProtectedRoute>
             ),
         },
