@@ -1,7 +1,6 @@
-package com.example.event.service;
-
-import com.example.event.Exception.EntityNotFoundException;
+import com.example.event.Exception.EntityAlreadyExistException;
 import com.example.event.Exception.ForbiddenException;
+import com.example.event.Exception.EntityNotFoundException;
 import com.example.event.dto.Subscription.SubscriptionRequest;
 import com.example.event.dto.Subscription.SubscriptionResponse;
 import com.example.event.model.*;
@@ -9,13 +8,18 @@ import com.example.event.repository.EventRepository;
 import com.example.event.repository.SubscriptionRepository;
 import com.example.event.repository.TicketCategoryRepository;
 import com.example.event.repository.VisitorProfileRepository;
+import com.example.event.utils.QRCodeGenerator;
 import com.example.event.utils.UtilSubscription;
+import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +33,7 @@ public class SubscriptionService {
     private final ProfileService profileService;
     private final EmailSenderService emailSenderService;
 
+    @Transactional
     public ResponseEntity<?> createSubscription(SubscriptionRequest subscriptionRequest) {
         User user = profileService.getAuthenticatedUser();
         VisitorProfile visitorProfile = user.getVisitorProfile();
@@ -40,6 +45,12 @@ public class SubscriptionService {
                 .orElseThrow(() -> new EntityNotFoundException("Event not found"));
         TicketCategory ticketCategory = ticketCategoryRepository.findById(subscriptionRequest.getId_ticket())
                 .orElseThrow(() -> new EntityNotFoundException("Ticket category not found"));
+
+        if (event.getPlaces() < subscriptionRequest.getPlaces()) {
+            throw new ForbiddenException("Not enough places available for this event.");
+        }
+        event.setPlaces(event.getPlaces() - subscriptionRequest.getPlaces());
+
 
         Subscription subscription = new Subscription();
         String codeticket;
@@ -57,29 +68,41 @@ public class SubscriptionService {
         subscription.setStatut(Statut_Subscription.REUSSI); // Assuming success for now
 
         subscriptionRepository.save(subscription);
+        eventRepository.save(event);
 
-        // Send confirmation email
-        emailSenderService.sendEmail(
-                user.getEmail(),
-                "Ticket Confirmation for Event: " + event.getTitle(),
-                "Thank you for your registration for " + event.getTitle() + ".\n" +
-                        "Visitor: " + visitorProfile.getName() + " " + visitorProfile.getSurname() + "\n" +
-                        "Number of places: " + subscription.getPlaces() + "\n" +
-                        "Total Amount: " + subscription.getMontant() + " CFA\n" +
-                        "Your Ticket Code: " + subscription.getCodeticket()
-        );
+        // Send confirmation email with QR Code
+        try {
+            byte[] qrCode = QRCodeGenerator.generateQRCodeImage(subscription.getCodeticket(), 250, 250);
+            String emailBody = "Thank you for your registration for " + event.getTitle() + ".\n" +
+                               "Visitor: " + visitorProfile.getName() + " " + visitorProfile.getSurname() + "\n" +
+                               "Number of places: " + subscription.getPlaces() + "\n" +
+                               "Total Amount: " + subscription.getMontant() + " CFA\n" +
+                               "Your Ticket Code: " + subscription.getCodeticket();
+
+            emailSenderService.sendEmailWithQRCode(
+                    user.getEmail(),
+                    "Ticket Confirmation for Event: " + event.getTitle(),
+                    emailBody,
+                    qrCode
+            );
+        } catch (WriterException | IOException e) {
+            // Log the error but don't block the user response
+            System.err.println("Failed to generate or send QR code email: " + e.getMessage());
+            // Optionally, send a simple email as a fallback
+            // emailSenderService.sendEmail(user.getEmail(), "Ticket Confirmation...", "Your ticket code is " + subscription.getCodeticket());
+        }
 
         SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
         return ResponseEntity.ok(subscriptionResponse);
     }
-
+     @Transactional(readOnly = true)
     public ResponseEntity<?> findSubsription(Long id) {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
         SubscriptionResponse subscriptionResponse = UtilSubscription.convertToSubscriptionResponse(subscription);
         return ResponseEntity.ok(subscriptionResponse);
     }
-
+     @Transactional(readOnly = true)
     public ResponseEntity<?> getAllSubscription() {
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         List<SubscriptionResponse> subscriptionResponses = subscriptions.stream()
@@ -87,7 +110,7 @@ public class SubscriptionService {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(subscriptionResponses);
     }
-
+    @Transactional
     public ResponseEntity<?> deleteSubscription(Long id) {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
@@ -96,11 +119,14 @@ public class SubscriptionService {
         if (!subscription.getVisitorProfile().getUser().getId().equals(user.getId())) {
             throw new ForbiddenException("You can only delete your own subscriptions.");
         }
+         Event event = subscription.getEvent();
+        event.setPlaces(event.getPlaces() + subscription.getPlaces());
+        eventRepository.save(event);
 
         subscriptionRepository.delete(subscription);
         return ResponseEntity.ok("Subscription deleted successfully!");
     }
-
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getSubscriptionsByVisitor() {
         User user = profileService.getAuthenticatedUser();
         VisitorProfile visitorProfile = user.getVisitorProfile();
@@ -113,7 +139,7 @@ public class SubscriptionService {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(subscriptionResponses);
     }
-
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getSubscriptionsByEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
@@ -123,4 +149,34 @@ public class SubscriptionService {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(subscriptionResponses);
     }
+    @Transactional
+    public SubscriptionResponse validateTicket(String ticketCode) {
+        User user = profileService.getAuthenticatedUser();
+        OrganizerProfile organizerProfile = user.getOrganizerProfile();
+        if (organizerProfile == null) {
+            throw new ForbiddenException("Only organizers can validate tickets.");
+        }
+
+        Subscription subscription = subscriptionRepository.findByCodeticket(ticketCode)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket with code " + ticketCode + " not found."));
+
+        Event event = subscription.getEvent();
+        if (!Objects.equals(event.getOrganizerProfile().getId(), organizerProfile.getId())) {
+            throw new ForbiddenException("You can only validate tickets for your own events.");
+        }
+
+        if (subscription.getStatut() == Statut_Subscription.UTILISE) {
+            throw new EntityAlreadyExistException("This ticket has already been used.");
+        }
+
+        if (subscription.getStatut() != Statut_Subscription.REUSSI) {
+            throw new ForbiddenException("This ticket is not valid for use (Status: " + subscription.getStatut() + ").");
+        }
+
+        subscription.setStatut(Statut_Subscription.UTILISE);
+        Subscription updatedSubscription = subscriptionRepository.save(subscription);
+
+        return UtilSubscription.convertToSubscriptionResponse(updatedSubscription);
+    }
 }
+

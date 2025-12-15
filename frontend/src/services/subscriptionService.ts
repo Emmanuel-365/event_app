@@ -24,3 +24,7 @@ export const getSubscriptionsByEvent = async (id: string) => {
 export const deleteSubscription = async (id: number) => {
   return axios.delete(`${API_URL}/${id}`);
 };
+
+export const validateTicket = async (ticketCode: string) => {
+  return axios.post(`${API_URL}/validate/${ticketCode}`);
+};

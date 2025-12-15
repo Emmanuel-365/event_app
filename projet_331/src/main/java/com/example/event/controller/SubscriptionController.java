@@ -1,6 +1,7 @@
 package com.example.event.controller;
 
 import com.example.event.dto.Subscription.SubscriptionRequest;
+import com.example.event.dto.Subscription.SubscriptionResponse;
 import com.example.event.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,5 +42,11 @@ public class SubscriptionController {
     @GetMapping("/event/{id}")
     public ResponseEntity<?> getSubscriptionsByEvent(@PathVariable Long id) {
         return subscriptionService.getSubscriptionsByEvent(id);
+    }
+
+    @PostMapping("/validate/{ticketCode}")
+    public ResponseEntity<SubscriptionResponse> validateTicket(@PathVariable String ticketCode) {
+        SubscriptionResponse response = subscriptionService.validateTicket(ticketCode);
+        return ResponseEntity.ok(response);
     }
 }

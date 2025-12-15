@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getGeneralRecommendation, getLocationRecommendations, getTimingRecommendations } from '../services/statsService';
+import { Link } from 'react-router-dom';
 
 interface GeneralRecommendation {
   meilleurMois: string;
@@ -91,6 +92,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto animate-pulse">
             <div className="h-10 bg-neutral-300 dark:bg-neutral-700 rounded-lg w-1/3 mb-8"></div>
+            <div className="h-24 bg-neutral-300 dark:bg-neutral-700 rounded-xl mb-8"></div>
             <div className="h-32 bg-neutral-300 dark:bg-neutral-700 rounded-xl mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="h-64 bg-neutral-300 dark:bg-neutral-700 rounded-xl"></div>
@@ -100,18 +102,27 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-        <div className="bg-yellow-100 dark:bg-yellow-900/20 border-l-4 border-yellow-400 text-yellow-700 dark:text-yellow-300 p-4 rounded-r-lg">
-            <p className="font-bold">Could not load data</p>
-            <p>{error}</p>
-        </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto">
       <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100 mb-8">Organizer Dashboard</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Link to="/ticket-scanner" className="bg-white dark:bg-neutral-800 shadow-lg hover:shadow-xl transition-shadow rounded-xl p-6 border border-neutral-200 dark:border-neutral-700 flex flex-col items-center justify-center text-center">
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 1v1m-6-1v1m-6-1v1M4 12h1m15 0h1M4 12h1m15 0h1M9 4h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z" />
+             </svg>
+             <h2 className="font-bold text-lg dark:text-white">Validate Tickets</h2>
+             <p className="text-sm text-neutral-500 dark:text-neutral-400">Scan QR codes at the door.</p>
+        </Link>
+         {/* Other action cards can go here */}
+      </div>
+
+      {error && (
+        <div className="bg-yellow-100 dark:bg-yellow-900/20 border-l-4 border-yellow-400 text-yellow-700 dark:text-yellow-300 p-4 rounded-r-lg mb-8">
+            <p className="font-bold">Could not load statistics</p>
+            <p>{error}</p>
+        </div>
+      )}
 
       {generalRec && generalRec.recommandationGenerale && (
         <div className="bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-700 dark:to-primary-800 text-white shadow-2xl rounded-xl p-8 mb-8">

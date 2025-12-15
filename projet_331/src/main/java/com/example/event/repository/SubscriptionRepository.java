@@ -13,6 +13,8 @@ import org.springframework.data.repository.query.Param;
 public interface SubscriptionRepository extends JpaRepository<Subscription,Long> {
     boolean existsByCodeticket(String codeticket);
 
+    Optional<Subscription> findByCodeticket(String codeticket);
+
 
 
     //METHODES STATISTIQUES 

@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from "./pages/Dashboard.tsx";
 import EventStats from "./pages/EventStats.tsx";
+import TicketScanner from "./pages/TicketScanner.tsx";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
             element: (
                 <ProtectedRoute role="ROLE_ORGANIZER">
                     <EventStats />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: '/ticket-scanner',
+            element: (
+                <ProtectedRoute role="ROLE_ORGANIZER">
+                    <TicketScanner />
                 </ProtectedRoute>
             ),
         },
