@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { createEvent } from '../services/eventService';
 import { createTicketCategory } from '../services/ticketCategoryService';
+import { createImage } from '../services/imageService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ImageUploader from '../components/ImageUploader';
 
 interface TicketCategory {
   intitule: string;
@@ -23,6 +25,7 @@ const CreateEvent: React.FC = () => {
   });
   
   const [ticketCategories, setTicketCategories] = useState<TicketCategory[]>([]);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [newTicket, setNewTicket] = useState({ intitule: '', prix: '' });
   
   const [message, setMessage] = useState('');
@@ -35,6 +38,18 @@ const CreateEvent: React.FC = () => {
 
   const handleTicketChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTicket({ ...newTicket, [e.target.name]: e.target.value });
+  };
+  
+  const handleCoverImageUpload = (url: string) => {
+    setFormData({ ...formData, profil_url: url });
+  };
+
+  const handleGalleryImageUpload = (url: string) => {
+    setGalleryImages([...galleryImages, url]);
+  };
+  
+  const removeGalleryImage = (index: number) => {
+    setGalleryImages(galleryImages.filter((_, i) => i !== index));
   };
 
   const addTicketCategory = () => {
@@ -66,15 +81,19 @@ const CreateEvent: React.FC = () => {
       const eventResponse = await createEvent(eventData);
       const newEventId = eventResponse.data.id;
 
-      await Promise.all(
-        ticketCategories.map(ticket => 
+      await Promise.all([
+        ...ticketCategories.map(ticket => 
           createTicketCategory({ ...ticket, id_event: newEventId })
+        ),
+        ...galleryImages.map(imageUrl => 
+          createImage({ imageurl: imageUrl, id_event: newEventId })
         )
-      );
+      ]);
 
-      setMessage('Event and tickets created successfully! Redirecting...');
+      setMessage('Event, tickets and images created successfully! Redirecting...');
       setFormData({ title: '', description: '', places: '', lieu: '', debut: '', fin: '', profil_url: '' });
       setTicketCategories([]);
+      setGalleryImages([]);
       setTimeout(() => navigate('/my-events'), 2000);
     } catch (err) {
       setError('Event creation failed. Please try again.');
@@ -125,11 +144,41 @@ const CreateEvent: React.FC = () => {
                 <input type="date" id="fin" name="fin" value={formData.fin} onChange={handleChange} className={inputStyle} required />
               </div>
             </div>
-            <div>
-              <label htmlFor="profil_url" className={labelStyle}>Event Cover Image URL (Optional)</label>
-              <input type="text" id="profil_url" name="profil_url" placeholder="https://example.com/image.png" value={formData.profil_url} onChange={handleChange} className={inputStyle} />
+             <div>
+              <label className={labelStyle}>Event Cover Image</label>
+              {formData.profil_url && (
+                <div className="mt-2">
+                  <img src={formData.profil_url} alt="Cover" className="w-full h-auto max-h-60 object-cover rounded-md" />
+                </div>
+              )}
+              <ImageUploader
+                onUploadSuccess={handleCoverImageUpload}
+                buttonText={formData.profil_url ? 'Change Cover Image' : 'Upload Cover Image'}
+                className="mt-2"
+              />
             </div>
           </fieldset>
+          
+           <fieldset className="space-y-4 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4">
+            <legend className="text-lg font-medium text-neutral-900 dark:text-white px-2">Event Gallery</legend>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {galleryImages.map((url, index) => (
+                <div key={index} className="relative group">
+                  <img src={url} alt={`Gallery item ${index + 1}`} className="w-full h-32 object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(index)}
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Remove image"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+            <ImageUploader onUploadSuccess={handleGalleryImageUpload} buttonText="Add to Gallery" />
+          </fieldset>
+
 
           <fieldset className="space-y-4 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4">
             <legend className="text-lg font-medium text-neutral-900 dark:text-white px-2">Ticket Categories</legend>

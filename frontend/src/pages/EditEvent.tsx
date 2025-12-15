@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getEventById, updateEvent } from '../services/eventService';
 import { createTicketCategory, deleteTicketCategory } from '../services/ticketCategoryService';
 import { createImage, deleteImage } from '../services/imageService';
+import ImageUploader from '../components/ImageUploader';
 
 interface Image {
   id: number;
@@ -34,7 +35,6 @@ const EditEvent: React.FC = () => {
   const [images, setImages] = useState<Image[]>([]);
   
   const [newTicket, setNewTicket] = useState({ intitule: '', prix: '' });
-  const [newImageUrl, setNewImageUrl] = useState('');
   
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -71,6 +71,20 @@ const EditEvent: React.FC = () => {
     if (formData) setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   
+  const handleCoverImageUpload = (url: string) => {
+    if (formData) {
+      setFormData({ ...formData, profil_url: url });
+      setMessage('Cover image updated. Click "Save Event Details" to apply.');
+    }
+  };
+  
+  const handleSetCoverImage = (url: string) => {
+    if (formData) {
+      setFormData({ ...formData, profil_url: url });
+      setMessage('Cover image selected. Click "Save Event Details" to make it permanent.');
+    }
+  };
+
   const handleTicketChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTicket({ ...newTicket, [e.target.name]: e.target.value });
   };
@@ -93,12 +107,11 @@ const EditEvent: React.FC = () => {
     } catch (err) { console.error(err); }
   };
 
-  const handleAddImage = async () => {
-    if (!id || !newImageUrl) return;
+  const handleAddImage = async (imageUrl: string) => {
+    if (!id) return;
     try {
-      const response = await createImage({ imageurl: newImageUrl, id_event: parseInt(id, 10) });
+      const response = await createImage({ imageurl: imageUrl, id_event: parseInt(id, 10) });
       setImages([...images, response.data]);
-      setNewImageUrl('');
     } catch (err) { console.error(err); }
   };
 
@@ -147,7 +160,7 @@ const EditEvent: React.FC = () => {
         </div>
         
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 md:p-8 border border-neutral-200 dark:border-neutral-700">
-            {message && <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg mb-6">{message}</div>}
+            {message && <div className="bg-green-100 dark:bg-green-900/20 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 rounded-r-lg mb-6">{message}</div>}
             
             <form onSubmit={handleSubmit} className="space-y-8">
                 <fieldset className="space-y-6">
@@ -162,7 +175,11 @@ const EditEvent: React.FC = () => {
                         <div><label htmlFor="debut" className={labelStyle}>Start Date</label><input type="date" id="debut" name="debut" value={formData.debut} onChange={handleChange} className={inputStyle} required /></div>
                         <div><label htmlFor="fin" className={labelStyle}>End Date</label><input type="date" id="fin" name="fin" value={formData.fin} onChange={handleChange} className={inputStyle} required /></div>
                     </div>
-                    <div><label htmlFor="profil_url" className={labelStyle}>Main Profile Image URL</label><input type="text" id="profil_url" name="profil_url" placeholder="https://..." value={formData.profil_url} onChange={handleChange} className={inputStyle} /></div>
+                     <div>
+                        <label className={labelStyle}>Main Profile Image</label>
+                        {formData.profil_url && <img src={formData.profil_url} alt="Cover" className="mt-2 w-full h-auto max-h-60 object-cover rounded-md" />}
+                        <ImageUploader onUploadSuccess={handleCoverImageUpload} buttonText={formData.profil_url ? 'Change Cover Image' : 'Upload Cover Image'} className="mt-2" />
+                    </div>
                     <div className="flex justify-end">
                         <button type="submit" className="inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400" disabled={isSubmitting}>
                             {isSubmitting && <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="opacity-75"></path></svg>}
@@ -178,12 +195,17 @@ const EditEvent: React.FC = () => {
                 <legend className="text-xl font-semibold text-neutral-900 dark:text-white">Event Gallery</legend>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {images.map((image) => (
-                    <div key={image.id} className="relative group"><img src={image.imageurl} alt="Event" className="w-full h-32 object-cover rounded-md" /><button onClick={() => setDeletingImage(image)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">✕</button></div>
+                    <div key={image.id} className="relative group">
+                        <img src={image.imageurl} alt="Event" className="w-full h-32 object-cover rounded-md" />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2">
+                           <button onClick={() => handleSetCoverImage(image.imageurl)} className="text-white text-xs bg-blue-600 hover:bg-blue-700 rounded px-2 py-1 mb-1 w-full text-center">Set as Cover</button>
+                           <button onClick={() => setDeletingImage(image)} className="text-white text-xs bg-red-600 hover:bg-red-700 rounded px-2 py-1 w-full text-center">Delete</button>
+                        </div>
+                    </div>
                     ))}
                 </div>
-                <div className="flex items-end gap-4 pt-4">
-                    <div className="flex-grow"><label htmlFor="newImageUrl" className={labelStyle}>New Image URL</label><input type="text" id="newImageUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} className={inputStyle} placeholder="https://..." /></div>
-                    <button type="button" onClick={handleAddImage} className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">Add Image</button>
+                <div className="pt-4">
+                    <ImageUploader onUploadSuccess={handleAddImage} buttonText="Add New Image to Gallery" />
                 </div>
             </fieldset>
 
