@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/admin';
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/admin`;
 
 export interface User {
   id: number;
@@ -14,7 +14,7 @@ export const getAllUsers = async (): Promise<User[]> => {
   return response.data;
 };
 
-export const updateUserRole = async (userId: number, newRole: UserRole): Promise<User> => {
+export const updateUserRole = async (userId: number, newRole: any): Promise<User> => {
   const response = await axios.put(`${API_URL}/users/${userId}/role`, newRole, {
     headers: {
       'Content-Type': 'application/json',

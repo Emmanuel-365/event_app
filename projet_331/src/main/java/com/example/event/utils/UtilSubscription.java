@@ -19,7 +19,9 @@ public class UtilSubscription {
                 subscription.getEvent().getDebut(),
                 subscription.getEvent().getLieu(),
                 subscription.getEvent().getOrganizerProfile().getName(),
-                subscription.getTicket().getIntitule()
+                subscription.getTicket().getIntitule(),
+                subscription.getEvent().getProfil_url(),
+                subscription.getCodeticket()
         );
     }
 }

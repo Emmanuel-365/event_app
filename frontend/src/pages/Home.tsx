@@ -52,7 +52,16 @@ const Home: React.FC = () => {
         }
 
         if (Array.isArray(trendingRes.data)) {
-          setTrendingEvents(trendingRes.data);
+          const adaptedTrendingEvents = trendingRes.data.map((trendingEvent: any) => ({
+            ...trendingEvent,
+            // Add default values for fields that are in Event but not in TrendingEventDTO
+            description: `This event is currently trending! With an occupancy rate of ${(trendingEvent.occupancyRate * 100).toFixed(0)}%, it's one of the hottest tickets right now.`,
+            debut: new Date().toISOString(),
+            fin: new Date().toISOString(),
+            organizer_name: "Popular Choice",
+            profil_url: `https://picsum.photos/seed/${trendingEvent.id}/400/250`,
+          }));
+          setTrendingEvents(adaptedTrendingEvents);
         }
 
         if (recommendedRes.data && Array.isArray(recommendedRes.data.evenementsRecommandes)) {

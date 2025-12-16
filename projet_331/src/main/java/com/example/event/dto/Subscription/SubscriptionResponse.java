@@ -23,4 +23,6 @@ public class SubscriptionResponse {
     private String event_lieu;
     private String organizer_name;
     private String nom_ticket;
+    private String event_profil_url;
+    private String codeticket;
 }

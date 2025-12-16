@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getSubscriptionsByUser, deleteSubscription } from '../services/subscriptionService';
+import { QRCodeCanvas } from 'qrcode.react';
 
 interface Subscription {
   id: number;
@@ -10,7 +11,8 @@ interface Subscription {
   event_lieu: string;
   nom_ticket: string;
   places: number;
-  event_profil_url: string; // Assuming backend can provide this
+  codeticket: string;
+  event_profil_url: string; 
 }
 
 const MySubscriptions: React.FC = () => {
@@ -18,6 +20,7 @@ const MySubscriptions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCancelModal, setShowCancelModal] = useState<number | null>(null);
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -93,9 +96,9 @@ const MySubscriptions: React.FC = () => {
                 </div>
               </div>
               <div className="w-full sm:w-auto flex-shrink-0 flex sm:flex-col justify-end gap-2 mt-4 sm:mt-0">
-                <Link to={`/event/${sub.event_id}`} className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 transition-colors">
-                  View Event
-                </Link>
+                <button onClick={() => setSelectedSubscription(sub)} className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 transition-colors">
+                    Show Ticket
+                </button>
                 <button onClick={() => setShowCancelModal(sub.id)} className="inline-flex items-center justify-center px-4 py-2 border border-neutral-300 dark:border-neutral-600 text-sm font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
                   Cancel
                 </button>
@@ -104,7 +107,8 @@ const MySubscriptions: React.FC = () => {
           ))}
         </div>
       )}
-
+      
+      {/* Cancellation Modal */}
       {showCancelModal !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50" aria-modal="true">
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -116,6 +120,34 @@ const MySubscriptions: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Ticket Modal */}
+      {selectedSubscription && (
+         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={() => setSelectedSubscription(null)}>
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-auto text-center" onClick={e => e.stopPropagation()}>
+                <h2 className="text-2xl font-bold text-primary-600 dark:text-primary-400">EVENT TICKET</h2>
+                <p className="text-sm text-neutral-500 mb-4">Present this QR code at the entrance</p>
+
+                <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg inline-block">
+                    <QRCodeCanvas value={selectedSubscription.codeticket} size={256} bgColor={"#ffffff"} fgColor={"#000000"} />
+                </div>
+                
+                <div className="mt-6 text-left space-y-2">
+                    <p className="text-lg font-bold text-neutral-800 dark:text-white">{selectedSubscription.event_name}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300">{new Date(selectedSubscription.event_debut).toLocaleString()}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300">{selectedSubscription.event_lieu}</p>
+                    <hr className="my-2 border-neutral-200 dark:border-neutral-700"/>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300"><strong>Ticket:</strong> {selectedSubscription.nom_ticket}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300"><strong>Places:</strong> {selectedSubscription.places}</p>
+                    <p className="text-sm font-mono p-2 bg-neutral-100 dark:bg-neutral-800 rounded-md text-neutral-700 dark:text-neutral-200 tracking-widest">{selectedSubscription.codeticket}</p>
+                </div>
+
+                <button onClick={() => setSelectedSubscription(null)} className="mt-6 w-full bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold py-2 px-4 rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
+                    Close
+                </button>
+            </div>
+         </div>
       )}
     </div>
   );
