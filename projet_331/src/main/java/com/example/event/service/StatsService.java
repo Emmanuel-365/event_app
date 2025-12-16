@@ -108,7 +108,7 @@ public class StatsService {
                     bestL.getLieu(), lieuFormat, nomMois, moisFormat, bestL.getLieu(), nomMois);
             dto.setRecommandationGenerale(recommendation);
         } else {
-            dto.setRecommandationGenerale("Historique insuffisant. Veuillez enregistrer plus d'événements 'TERMINÉ' et de souscriptions 'REUSSI' pour une analyse.");
+            dto.setRecommandationGenerale("Historique insuffisant. Veuillez enregistrer plus d'événements 'TERMINE' et de souscriptions 'REUSSI' pour une analyse.");
         }
         return dto;
     }

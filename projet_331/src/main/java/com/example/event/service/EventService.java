@@ -47,7 +47,7 @@ public class EventService {
         if (eventRequest.getDebut().isAfter(LocalDate.now())) {
             event.setStatut(Statut_Event.PROCHAINEMENT);
         } else if (eventRequest.getFin().isBefore(LocalDate.now())) {
-            event.setStatut(Statut_Event.TERMINÉ);
+            event.setStatut(Statut_Event.TERMINE);
         } else {
             event.setStatut(Statut_Event.EN_COURS);
         }
