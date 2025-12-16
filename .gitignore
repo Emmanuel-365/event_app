@@ -152,10 +152,6 @@ $RECYCLE.BIN/
 ################################################################################
 # DOCKER / CONTAINERS (si utilisé)
 ################################################################################
-docker-compose.override.yml
-.docker/
-Dockerfile*
-docker-compose*.yml
 *.tar
 *.img
 *.pid

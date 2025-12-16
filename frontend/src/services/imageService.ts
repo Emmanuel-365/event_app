@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { AUTH_BASE_URL } from '../config';
 
-const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/image`;
+const API_URL = `${AUTH_BASE_URL}/image`;
 
 interface ImageData {
   imageurl: string;

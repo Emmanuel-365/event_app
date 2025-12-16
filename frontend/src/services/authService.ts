@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API_BASE_URL, AUTH_BASE_URL } from '../config';
 
 axios.defaults.withCredentials = true; // Important for sessions/cookies
 
@@ -29,7 +28,7 @@ export const login = async (credentials: Credentials) => {
   params.append('username', credentials.email);
   params.append('password', credentials.password);
 
-  return axios.post(`${API_URL}/login`, params, {
+  return axios.post(`${AUTH_BASE_URL}/login`, params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -37,22 +36,22 @@ export const login = async (credentials: Credentials) => {
 };
 
 export const logout = async () => {
-  return axios.post(`${API_URL}/logout`);
+  return axios.post(`${AUTH_BASE_URL}/logout`);
 };
 
 export const register = async (data: RegisterData) => {
-    return axios.post(`${API_URL}/api/auth/register`, data);
+    return axios.post(`${API_BASE_URL}/auth/register`, data);
 }
 
 export const getMe = async () => {
-  return axios.get(`${API_URL}/api/profile/me`);
+  return axios.get(`${API_BASE_URL}/profile/me`);
 };
 
 export const forgotPassword = async (email: string) => {
-  return axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+  return axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
 };
 
 export const resetPassword = async (token: string, newPassword: string) => {
-  return axios.post(`${API_URL}/api/auth/reset-password`, { token, newPassword });
+  return axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword });
 };
 

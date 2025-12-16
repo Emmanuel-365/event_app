@@ -1,0 +1,54 @@
+# render.yaml
+# Ce fichier décrit les services de votre application pour le déploiement sur Render.
+#
+# NOTE: L'analyseur syntaxique de votre éditeur peut afficher des erreurs pour ce fichier.
+# La spécification des Blueprints de Render est complexe et de nombreux éditeurs ont des schémas
+# de validation incomplets. Par exemple, la propriété 'env: docker' est correcte mais peut être
+# signalée comme une erreur. Cette configuration est basée sur la documentation officielle de Render.
+
+services:
+  # === Service Backend (Java/Spring Boot) ===
+  - type: web
+    name: backend
+    # La propriété 'runtime' n'est pas nécessaire lorsque 'env' est 'docker'.
+    env: docker
+    dockerContext: ./projet_331
+    dockerfilePath: ./projet_331/Dockerfile
+    # La propriété 'ports' est inutile; Render utilise l'instruction EXPOSE du Dockerfile (ici, 8080).
+    envVars:
+      # Fournit au backend l'URL publique du frontend.
+      # Utile pour générer les liens dans les emails (ex: réinitialisation de mot de passe).
+      - key: app.frontend-url
+        fromService:
+          type: web
+          name: frontend
+          property: url
+      # --- IMPORTANT: CONFIGURATION DE LA BASE DE DONNÉES ---
+      # 1. Créez une base de données PostgreSQL depuis votre tableau de bord Render.
+      # 2. Récupérez son nom (ex: 'ma-db-123').
+      # 3. Décommentez les lignes ci-dessous et remplacez 'nom-de-votre-db'
+      #    par le nom réel de votre base de données.
+      # - key: SPRING_DATASOURCE_URL
+      #   fromDatabase:
+      #     name: nom-de-votre-db
+      #     property: connectionString
+      # - key: SPRING_DATASOURCE_USERNAME
+      #   fromDatabase:
+      #     name: nom-de-votre-db
+      #     property: user
+      # - key: SPRING_DATASOURCE_PASSWORD
+      #   fromDatabase:
+      #     name: nom-de-votre-db
+      #     property: password
+
+  # === Service Frontend (React/Vite + Nginx) ===
+  - type: web
+    name: frontend
+    env: docker
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    # La propriété 'ports' est inutile; Render utilise l'instruction EXPOSE du Dockerfile (ici, 80).
+    # 'dockerBuildCommand' indique à Render comment passer l'URL du backend
+    # comme argument au moment de la construction de l'image Docker du frontend.
+    # Ceci peut être signalé comme une erreur par votre éditeur, mais c'est valide.
+    dockerBuildCommand: "docker build --build-arg VITE_API_URL=${backend.url} -t $IMAGE_NAME ."

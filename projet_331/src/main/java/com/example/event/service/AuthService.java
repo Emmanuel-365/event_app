@@ -10,12 +10,12 @@ import com.example.event.repository.PasswordResetTokenRepository;
 import com.example.event.repository.UserRepository;
 import com.example.event.repository.VisitorProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -28,6 +28,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailSenderService emailSenderService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -77,7 +80,7 @@ public class AuthService {
         PasswordResetToken resetToken = new PasswordResetToken(token, user);
         passwordResetTokenRepository.save(resetToken);
 
-        String resetLink = "http://localhost:5173/reset-password?token=" + token; // Frontend URL
+        String resetLink = frontendUrl + "/reset-password?token=" + token; // Frontend URL
         emailSenderService.sendEmail(
                 user.getEmail(),
                 "Password Reset Request",
