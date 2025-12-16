@@ -30,6 +30,8 @@ public class ProfileService {
             return user.getVisitorProfile(); // This will be serialized to JSON
         } else if (user.getRole() == com.example.event.model.UserRole.ROLE_ORGANIZER) {
             return user.getOrganizerProfile(); // This will be serialized to JSON
+        } else if (user.getRole() == com.example.event.model.UserRole.ROLE_ADMIN) {
+            return user; // Return the base user object for admins
         }
         throw new IllegalStateException("User has no valid profile role");
     }

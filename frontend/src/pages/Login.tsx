@@ -25,9 +25,12 @@ const Login: React.FC = () => {
       await loginService(formData);
       const userResponse = await getMe();
       
-      const user = userResponse.data.user;
-      if (user && user.role) {
-        login({ id: user.id, email: user.email, role: user.role });
+      // The backend returns the profile for Visitors/Organizers (which contains a 'user' object),
+      // but returns the user object itself for Admins. We need to handle both cases.
+      const potentialUser = userResponse.data.user || userResponse.data;
+
+      if (potentialUser && potentialUser.role) {
+        login({ id: potentialUser.id, email: potentialUser.email, role: potentialUser.role });
         navigate('/');
       } else {
         setError('Could not retrieve user details after login.');

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
-  role?: 'ROLE_VISITOR' | 'ROLE_ORGANIZER';
+  role?: 'ROLE_VISITOR' | 'ROLE_ORGANIZER' | 'ROLE_ADMIN';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {

@@ -61,6 +61,13 @@ public class DataInitializer implements CommandLineRunner {
 
             userRepository.save(visitorUser);
 
+            // Create Admin User
+            User adminUser = new User();
+            adminUser.setEmail("admin@example.com");
+            adminUser.setPassword(passwordEncoder.encode("password"));
+            adminUser.setRole(UserRole.ROLE_ADMIN);
+            userRepository.save(adminUser);
+
             // Create Event 1
             Event event1 = new Event();
             event1.setTitle("Grand Concert de Jazz");

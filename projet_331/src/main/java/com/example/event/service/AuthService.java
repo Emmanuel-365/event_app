@@ -8,6 +8,7 @@ import com.example.event.model.*;
 import com.example.event.repository.OrganizerProfileRepository;
 import com.example.event.repository.PasswordResetTokenRepository;
 import com.example.event.repository.UserRepository;
+import com.example.event.repository.VisitorProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,8 +70,8 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
 
-        // Delete any existing tokens for this user
-        passwordResetTokenRepository.deleteByUser(user);
+        // Find and delete any existing token for this user
+        passwordResetTokenRepository.findByUser(user).ifPresent(passwordResetTokenRepository::delete);
 
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken(token, user);

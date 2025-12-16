@@ -1,12 +1,11 @@
 import axios from 'axios';
-import { UserRole } from '../context/AuthContext'; // Assuming UserRole is defined here or similar
 
 const API_URL = 'http://localhost:8080/api/admin';
 
 export interface User {
   id: number;
   email: string;
-  role: UserRole;
+  role: any;
   // Add other user fields as needed
 }
 

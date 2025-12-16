@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsers, updateUserRole, deleteUser, User } from '../services/adminService';
+import { getAllUsers, updateUserRole, deleteUser, type User } from '../services/adminService';
 import { Link } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
