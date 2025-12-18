@@ -7,8 +7,19 @@ export interface User {
   id: number;
   email: string;
   role: any;
+  enabled: boolean;
   // Add other user fields as needed
 }
+
+export const updateUserStatus = async (userId: number, enabled: boolean): Promise<User> => {
+  const response = await axios.put(`${API_URL}/users/${userId}/status`, enabled, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data;
+};
+
 
 export const getAllUsers = async (): Promise<User[]> => {
   const response = await axios.get(`${API_URL}/users`);

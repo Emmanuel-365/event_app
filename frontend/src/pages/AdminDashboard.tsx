@@ -1,63 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsers, updateUserRole, deleteUser, type User } from '../services/adminService';
-import { Link } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getAllUsers();
-      setUsers(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch users.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (user?.role === 'ROLE_ADMIN') {
-      fetchUsers();
-    }
-  }, [user]);
-
-  const handleChangeRole = async (userId: number, newRole: string) => {
-    if (!user || user.id === userId) {
-        setMessage("Admin cannot change their own role or delete their own account for security reasons.");
-        return;
-    }
-    try {
-      await updateUserRole(userId, newRole as User['role']);
-      setMessage('User role updated successfully!');
-      fetchUsers(); // Refresh the list
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update user role.');
-    }
-  };
-
-  const handleDeleteUser = async (userId: number) => {
-    if (!user || user.id === userId) {
-        setMessage("Admin cannot change their own role or delete their own account for security reasons.");
-        return;
-    }
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(userId);
-        setMessage('User deleted successfully!');
-        fetchUsers(); // Refresh the list
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to delete user.');
-      }
-    }
-  };
+  const location = useLocation();
 
   if (!user || user.role !== 'ROLE_ADMIN') {
     return (
@@ -69,56 +16,74 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  if (loading) {
-    return <div className="text-center p-8">Loading users...</div>;
-  }
-
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <h1 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-6">Admin Dashboard</h1>
+    <div className="flex min-h-screen bg-neutral-100 dark:bg-neutral-900">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white dark:bg-neutral-800 shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">Admin Panel</h2>
+        <nav>
+          <ul>
+            <li className="mb-3">
+              <Link
+                to="/admin/dashboard"
+                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                  location.pathname === '/admin/dashboard'
+                    ? 'bg-primary-500 text-white shadow-md'
+                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                <svg className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                Dashboard Overview
+              </Link>
+            </li>
+            <li className="mb-3">
+              <Link
+                to="/admin/users"
+                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                  location.pathname === '/admin/users'
+                    ? 'bg-primary-500 text-white shadow-md'
+                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                <svg className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292V15.708a4 4 0 010 5.292m0-10.584L2.94 4.876M9 10.605a4 4 0 01-2.94 4.876M9 10.605V15.708m0 0a4 4 0 012.94 4.876M12 4.354h.001M12 15.708h.001" /></svg>
+                User Management
+              </Link>
+            </li>
+            <li className="mb-3">
+              <Link
+                to="/admin/events"
+                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                  location.pathname === '/admin/events'
+                    ? 'bg-primary-500 text-white shadow-md'
+                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                <svg className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h.01M13 11h.01M17 11h.01M9 15h.01M13 15h.01M17 15h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2v14a2 2 0 002 2z" /></svg>
+                Event Management
+              </Link>
+            </li>
+            <li className="mb-3">
+              <Link
+                to="/admin/comments"
+                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                  location.pathname === '/admin/comments'
+                    ? 'bg-primary-500 text-white shadow-md'
+                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                <svg className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h10M7 16h10M14.5 19L17 21l2.5-2.5" /></svg>
+                Comment Moderation
+              </Link>
+            </li>
+            {/* TODO: Add links for Event Management, Content Moderation, etc. */}
+          </ul>
+        </nav>
+      </aside>
 
-      {message && <div className="bg-green-100 dark:bg-green-900/20 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 rounded-r-lg mb-4">{message}</div>}
-      {error && <div className="bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg mb-4">{error}</div>}
-
-      <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-xl p-6 border border-neutral-200 dark:border-neutral-700 overflow-x-auto">
-        <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-          <thead className="bg-neutral-50 dark:bg-neutral-700">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">ID</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Email</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Role</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-neutral-800 divide-y divide-neutral-200 dark:divide-neutral-700">
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900 dark:text-white">{u.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600 dark:text-neutral-300">{u.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600 dark:text-neutral-300">
-                  <select
-                    value={u.role}
-                    onChange={(e) => handleChangeRole(u.id, e.target.value)}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-neutral-300 dark:border-neutral-600 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md dark:bg-neutral-700 dark:text-white"
-                  >
-                    <option value="ROLE_VISITOR">Visitor</option>
-                    <option value="ROLE_ORGANIZER">Organizer</option>
-                    <option value="ROLE_ADMIN">Admin</option>
-                  </select>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    onClick={() => handleDeleteUser(u.id)}
-                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Main Content */}
+      <main className="flex-1 p-8">
+        <Outlet /> {/* This is where child routes will be rendered */}
+      </main>
     </div>
   );
 };

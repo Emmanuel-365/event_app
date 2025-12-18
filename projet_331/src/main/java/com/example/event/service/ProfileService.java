@@ -57,6 +57,20 @@ public class ProfileService {
     }
 
     @Transactional
+    public User updateUserStatus(Long userId, boolean enabled) {
+        User authenticatedUser = getAuthenticatedUser();
+        if (authenticatedUser.getId().equals(userId) && !enabled) {
+            throw new ForbiddenException("An administrator cannot disable their own account.");
+        }
+
+        User userToUpdate = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        userToUpdate.setEnabled(enabled);
+        return userRepository.save(userToUpdate);
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         User authenticatedUser = getAuthenticatedUser();
         if (authenticatedUser.getId().equals(userId)) {

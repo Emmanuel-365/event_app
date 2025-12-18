@@ -16,7 +16,11 @@ import Dashboard from "./pages/Dashboard.tsx";
 import EventStats from "./pages/EventStats.tsx";
 import TicketScanner from "./pages/TicketScanner.tsx";
 import PaymentSimulation from "./pages/PaymentSimulation.tsx";
-import AdminDashboard from "./pages/AdminDashboard.tsx";
+import AdminLayout from "./pages/AdminDashboard";
+import UserManagementPage from "./pages/UserManagementPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminEventManagement from "./pages/AdminEventManagement";
+import AdminCommentModeration from "./pages/AdminCommentModeration";
 import ForgotPassword from "./pages/ForgotPassword.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 
@@ -86,14 +90,20 @@ const router = createBrowserRouter([
                 </ProtectedRoute>
             ),
         },
-        {
-            path: '/admin/dashboard',
-            element: (
-                <ProtectedRoute role="ROLE_ADMIN">
-                    <AdminDashboard />
-                </ProtectedRoute>
-            ),
-        },
+      {
+        path: '/admin',
+        element: (
+          <ProtectedRoute role="ROLE_ADMIN">
+            <AdminLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: 'dashboard', element: <AdminDashboardPage /> },
+          { path: 'users', element: <UserManagementPage /> },
+          { path: 'events', element: <AdminEventManagement /> },
+          { path: 'comments', element: <AdminCommentModeration /> },
+        ],
+      },
       {
         path: '/my-subscriptions',
         element: (

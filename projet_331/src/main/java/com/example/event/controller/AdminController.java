@@ -28,6 +28,12 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PutMapping("/users/{userId}/status")
+    public ResponseEntity<User> updateUserStatus(@PathVariable Long userId, @RequestBody boolean enabled) {
+        User updatedUser = profileService.updateUserStatus(userId, enabled);
+        return ResponseEntity.ok(updatedUser);
+    }
+
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         profileService.deleteUser(userId);

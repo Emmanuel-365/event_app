@@ -34,4 +34,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
            "GROUP BY s.ticket.intitule, s.ticket.Id")
     List<SubscriptionCountDTO> countPlacesByTicketCategoryAndEventId(@Param("eventId") Long eventId);
 
+    @Query("SELECT SUM(s.montant) FROM Subscription s WHERE s.statut = 'REUSSI'")
+    Optional<Long> sumSuccessfulMontant();
+
 }

@@ -47,6 +47,7 @@ function App() {
   };
   
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const is_admin_route = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
@@ -163,7 +164,7 @@ function App() {
       </nav>
 
       <main>
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className={is_admin_route ? "py-6 sm:px-6 lg:px-8" : "max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"}>
           <Outlet />
         </div>
       </main>

@@ -1,6 +1,7 @@
 package com.example.event.utils;
 
 import com.example.event.dto.Subscription.SubscriptionResponse;
+import com.example.event.dto.Visitor.VisitorDto;
 import com.example.event.model.Subscription;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,12 @@ public class UtilSubscription {
                 subscription.getMontant(),
                 subscription.getPlaces(),
                 subscription.getCreatedAt(),
-                subscription.getVisitorProfile().getId(),
-                subscription.getVisitorProfile().getName(),
+                new VisitorDto(
+                        subscription.getVisitorProfile().getId(),
+                        subscription.getVisitorProfile().getName(),
+                        subscription.getVisitorProfile().getSurname(),
+                        subscription.getVisitorProfile().getUser().getEmail()
+                ),
                 subscription.getEvent().getId(),
                 subscription.getEvent().getTitle(),
                 subscription.getEvent().getDebut(),

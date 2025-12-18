@@ -23,6 +23,7 @@ public class Event {
     private String profil_url;
     @Enumerated(EnumType.STRING)
     private Statut_Event statut;
+    private boolean featured = false;
 
     @ManyToOne
     @JoinColumn(name="organizer_profile_id")

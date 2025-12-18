@@ -1,5 +1,6 @@
 package com.example.event.dto.Subscription;
 
+import com.example.event.dto.Visitor.VisitorDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,7 @@ public class SubscriptionResponse {
     private int montant;
     private int places;
     private LocalDateTime createdAt;
-    private Long visitor_id;
-    private String visitor_name;
+    private VisitorDto visitor;
     private Long event_id;
     private String event_name;
     private LocalDate event_debut;
