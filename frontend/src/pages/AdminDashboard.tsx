@@ -4,7 +4,7 @@ import { getAllUsers, updateUserRole, deleteUser, type User } from '../services/
 import { Link } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

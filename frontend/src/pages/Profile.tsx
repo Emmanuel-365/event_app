@@ -96,7 +96,7 @@ const Profile: React.FC = () => {
                     <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{profileData.name} {profileData.surname || ''}</h2>
                     <p className="text-sm text-neutral-500 dark:text-neutral-400">{profileData.email}</p>
                     <span className="mt-4 inline-block bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-primary-900/50 dark:text-primary-300">
-                        {user?.role.replace('ROLE_', '').charAt(0) + user?.role.replace('ROLE_', '').slice(1).toLowerCase()}
+                        {user && user.role.replace('ROLE_', '').charAt(0) + user.role.replace('ROLE_', '').slice(1).toLowerCase()}
                     </span>
                 </div>
             </div>

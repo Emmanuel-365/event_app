@@ -11,7 +11,7 @@ const Register: React.FC = () => {
     password: '',
     surname: '',
     city: '',
-    annee_activite: '',
+    annee_activite: undefined,
     instagram_url: '',
     facebook_url: '',
     whatsapp_url: '',
@@ -27,7 +27,7 @@ const Register: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'annee_activite' ? parseInt(value, 10) : value,
       // Reset fields when role changes
       ...(name === 'role' && {
         ...initialFormData,

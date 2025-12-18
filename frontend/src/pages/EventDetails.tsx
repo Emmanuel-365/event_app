@@ -3,6 +3,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getEventById } from '../services/eventService';
 import { useAuth } from '../context/AuthContext';
 import { createSubscription } from '../services/subscriptionService';
+import { getComments, createComment } from '../services/commentService';
+import { getLikeCount, getLikeStatus, likeEvent, unlikeEvent } from '../services/likeService';
+import { CommentForm } from '../components/CommentForm';
+import { CommentList } from '../components/CommentList';
+
 
 interface TicketCategory {
   id: number;
@@ -38,6 +43,9 @@ export const EventDetails: React.FC = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
 
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -52,6 +60,18 @@ export const EventDetails: React.FC = () => {
           if (response.data.ticketCategoryList && response.data.ticketCategoryList.length > 0) {
             setSelectedTicket(String(response.data.ticketCategoryList[0].id));
           }
+          
+          const likeCountResponse = await getLikeCount(id);
+          setLikes(likeCountResponse.count);
+
+          if (user) {
+            const likeStatusResponse = await getLikeStatus(id);
+            setIsLiked(likeStatusResponse);
+          }
+
+          const commentsResponse = await getComments(id);
+          setComments(commentsResponse);
+
         } catch (err) {
           setError('Could not fetch event details.');
           console.error(err);
@@ -61,7 +81,7 @@ export const EventDetails: React.FC = () => {
       }
     };
     fetchEvent();
-  }, [id]);
+  }, [id, user]);
 
   const handleSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +112,44 @@ export const EventDetails: React.FC = () => {
       console.error(err);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!user || !id) {
+      setError('You must be logged in to like an event.');
+      return;
+    }
+
+    try {
+      if (isLiked) {
+        await unlikeEvent(id);
+        setLikes(prev => prev - 1);
+        setIsLiked(false);
+      } else {
+        await likeEvent(id);
+        setLikes(prev => prev + 1);
+        setIsLiked(true);
+      }
+    } catch (err) {
+      setError('An error occurred while liking the event.');
+      console.error(err);
+    }
+  };
+
+  const handleCommentSubmit = async (content: string, parentId?: number) => {
+    if (!user || !id) {
+      setError('You must be logged in to comment.');
+      return;
+    }
+
+    try {
+      await createComment(id, { content, parentCommentId: parentId });
+      const commentsResponse = await getComments(id);
+      setComments(commentsResponse);
+    } catch (err) {
+      setError('An error occurred while posting the comment.');
+      console.error(err);
     }
   };
 
@@ -138,7 +196,19 @@ export const EventDetails: React.FC = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             <div className="lg:col-span-2">
-                <h1 className="text-4xl md:text-5xl font-extrabold text-neutral-900 dark:text-white mb-4">{event.title}</h1>
+                <div className="flex justify-between items-start">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-neutral-900 dark:text-white mb-4">{event.title}</h1>
+                    <button
+                        onClick={handleLike}
+                        disabled={!user}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 ${isLiked ? 'bg-red-500 text-white' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill={isLiked ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.66l1.318-1.342a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+                        </svg>
+                        <span>{likes}</span>
+                    </button>
+                </div>
                 <div className="flex flex-wrap gap-x-6 gap-y-2 mb-6">
                     <InfoPill icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} text={event.organizer_name} />
                     <InfoPill icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} text={event.lieu} />
@@ -155,6 +225,12 @@ export const EventDetails: React.FC = () => {
                         </div>
                     </div>
                 )}
+
+                <div className="mt-12">
+                    <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">Comments</h2>
+                    <CommentForm onSubmit={handleCommentSubmit} />
+                    <CommentList comments={comments} onReply={handleCommentSubmit} />
+                </div>
             </div>
 
             <div className="lg:sticky top-24 self-start">

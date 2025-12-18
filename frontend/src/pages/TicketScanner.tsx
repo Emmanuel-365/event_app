@@ -15,7 +15,6 @@ type ValidationStatus = 'idle' | 'scanning' | 'success' | 'used' | 'invalid' | '
 
 const TicketScanner: React.FC = () => {
     const { user } = useAuth();
-    const [scanResult, setScanResult] = useState<string | null>(null);
     const [status, setStatus] = useState<ValidationStatus>('idle');
     const [validatedData, setValidatedData] = useState<ValidatedTicketData | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -34,7 +33,6 @@ const TicketScanner: React.FC = () => {
 
         const onScanSuccess = (decodedText: string) => {
             scanner.clear();
-            setScanResult(decodedText);
             handleValidate(decodedText);
         };
 
@@ -84,7 +82,6 @@ const TicketScanner: React.FC = () => {
     };
     
     const resetScanner = () => {
-        setScanResult(null);
         setStatus('idle');
         setValidatedData(null);
         setErrorMessage('');
