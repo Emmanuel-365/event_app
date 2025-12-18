@@ -260,7 +260,7 @@ export const EventDetails: React.FC = () => {
                                 <label htmlFor="quantity" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Quantity</label>
                                 <div className="flex items-center">
                                     <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="px-3 py-1 border border-neutral-300 dark:border-neutral-600 rounded-l-md">-</button>
-                                    <input type="number" id="quantity" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} min="1" className="w-16 text-center border-t border-b border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800" />
+                                    <input type="number" id="quantity" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} min="1" className="w-16 text-center border-t border-b border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 dark:text-neutral-200" />
                                     <button type="button" onClick={() => setQuantity(q => q + 1)} className="px-3 py-1 border border-neutral-300 dark:border-neutral-600 rounded-r-md">+</button>
                                 </div>
                             </div>
