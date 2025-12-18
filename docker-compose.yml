@@ -1,22 +1,50 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16
+    container_name: event_app_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: event_app
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U event_user -d event_app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./projet_331
       dockerfile: Dockerfile
+    container_name: event_app_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       - app.frontend-url=http://localhost:5173
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/event_app
+      - SPRING_DATASOURCE_USERNAME=event_user
+      - SPRING_DATASOURCE_PASSWORD=event_password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
+        VITE_IMGBB_API_KEY: 2b8e59d4aaf49f0c1e7ff772eb7dea64
         VITE_API_URL: http://localhost:8080
     ports:
       - "5173:80"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
