@@ -84,6 +84,12 @@ const Register: React.FC = () => {
                 <label htmlFor="name" className={labelStyle}>{formData.role === 'ROLE_VISITOR' ? 'Name' : 'Organizer Name'}</label>
                 <input id="name" name="name" type="text" required className={inputStyle} placeholder={formData.role === 'ROLE_VISITOR' ? 'John' : 'Awesome Events Inc.'} value={formData.name} onChange={handleChange} />
             </div>
+            {formData.role === 'ROLE_VISITOR' && (
+                <div>
+                    <label htmlFor="surname" className={labelStyle}>Surname</label>
+                    <input id="surname" name="surname" type="text" required className={inputStyle} placeholder="Doe" value={formData.surname || ''} onChange={handleChange} />
+                </div>
+            )}
             <div>
                 <label htmlFor="email" className={labelStyle}>Email</label>
                 <input id="email" name="email" type="email" required className={inputStyle} placeholder="you@example.com" value={formData.email} onChange={handleChange} />
@@ -99,16 +105,10 @@ const Register: React.FC = () => {
 
             {/* Visitor Fields */}
             {formData.role === 'ROLE_VISITOR' && (
-              <>
-                <div>
-                    <label htmlFor="surname" className={labelStyle}>Surname</label>
-                    <input id="surname" name="surname" type="text" required className={inputStyle} placeholder="Doe" value={formData.surname || ''} onChange={handleChange} />
-                </div>
                 <div>
                     <label htmlFor="city" className={labelStyle}>City</label>
                     <input id="city" name="city" type="text" required className={inputStyle} placeholder="New York" value={formData.city || ''} onChange={handleChange} />
                 </div>
-              </>
             )}
 
             {/* Organizer Fields */}
