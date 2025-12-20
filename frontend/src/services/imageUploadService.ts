@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
+const API_KEY = '2b8e59d4aaf49f0c1e7ff772eb7dea64';
 const UPLOAD_URL = 'https://api.imgbb.com/1/upload';
 
 /**
@@ -11,7 +11,7 @@ const UPLOAD_URL = 'https://api.imgbb.com/1/upload';
  */
 export const uploadImage = async (file: File): Promise<string> => {
   if (!API_KEY) {
-    throw new Error('ImgBB API key is not configured. Please set VITE_IMGBB_API_KEY in your .env file.');
+    throw new Error('ImgBB API key is not configured.');
   }
 
   const formData = new FormData();
