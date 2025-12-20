@@ -10,9 +10,10 @@ RUN npm install
 COPY . .
 
 # Build the application
-# The VITE_API_URL will be passed as a build argument
+# The VITE_API_URL and VITE_IMGBB_API_KEY will be passed as build arguments
 ARG VITE_API_URL
-RUN VITE_API_URL=${VITE_API_URL} npm run build
+ARG VITE_IMGBB_API_KEY
+RUN VITE_API_URL=${VITE_API_URL} VITE_IMGBB_API_KEY=${VITE_IMGBB_API_KEY} npm run build
 
 # Stage 2: Serve the application using Nginx
 FROM nginx:alpine

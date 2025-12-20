@@ -16,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - event_app_network
 
   backend:
     build:
@@ -33,6 +35,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=event_user
       - SPRING_DATASOURCE_PASSWORD=event_password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - event_app_network
 
   frontend:
     build:
@@ -41,10 +45,17 @@ services:
       args:
         VITE_IMGBB_API_KEY: 2b8e59d4aaf49f0c1e7ff772eb7dea64
         VITE_API_URL: http://localhost:8080
+    container_name: event_app_frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
+    networks:
+      - event_app_network
 
 volumes:
   postgres_data:
+
+networks:
+  event_app_network:
+    driver: bridge
