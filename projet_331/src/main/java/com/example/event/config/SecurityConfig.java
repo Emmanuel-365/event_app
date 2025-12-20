@@ -56,10 +56,48 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/event", "/event/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/event").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.PUT, "/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.DELETE, "/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/member/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/ticket/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers("/image/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/subscription").hasAuthority("ROLE_VISITOR")
+                        .requestMatchers(HttpMethod.GET, "/subscription/visitor/me").hasAuthority("ROLE_VISITOR")
+                        .requestMatchers(HttpMethod.GET, "/subscription/event/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/subscription/validate/**").hasAuthority("ROLE_ORGANIZER")
+                        .requestMatchers(HttpMethod.GET, "/api/events/{eventId}/comments").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/events/{eventId}/comments").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/comments/{commentId}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/{commentId}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/events/{eventId}/likes").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/events/{eventId}/likes").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/events/{eventId}/likes/count").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/{eventId}/likes/status").authenticated()
+                        .requestMatchers("/api/profile/me").authenticated()
+                        .requestMatchers("/api/stats/recommendation").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN") // New admin rule
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())
-                .logout(logout -> logout.disable());
+                .formLogin(form -> form
+                        .loginProcessingUrl("/login")
+                        .successHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(401);
+                        })
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .permitAll()
+                );
 
         return http.build();
     }
