@@ -53,8 +53,8 @@ C'est la méthode la plus simple et la plus fiable pour lancer l'ensemble de l'a
     ```
 
 3.  **Accédez à l'application :**
-    -   **Frontend** : [http://localhost:5173](http://localhost:5173)
-    -   **API Backend** : [http://localhost:8080](http://localhost:8080)
+    -   **Frontend** : [http://127.0.0.1:5173](http://127.0.0.1:5173)
+    -   **API Backend** : [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
 Pour arrêter tous les services, exécutez `docker compose down`. Pour préserver les données de la base de données, ajoutez `-v` : `docker compose down -v`.
 
@@ -77,7 +77,7 @@ Ce fichier définit les 3 services qui composent l'application en environnement 
 
 -   `frontend` :
     -   Construction : Bâtit une image à partir du `Dockerfile` dans `./frontend`.
-    -   Configuration au build : Une `VITE_API_URL` (ici, `http://localhost:8080`) est passée à Vite au moment de la construction pour que le frontend sache où contacter l'API backend.
+    -   Configuration au build : Une `VITE_API_URL` (ici, `http://127.0.0.1:8080`) est passée à Vite au moment de la construction pour que le frontend sache où contacter l'API backend.
     -   Serveur : Le résultat du build (fichiers statiques HTML/CSS/JS) est servi par un serveur web Nginx léger et performant.
 
 ### `Dockerfile` (Backend & Frontend)
@@ -119,4 +119,4 @@ Cette méthode est utile pour travailler sur un seul service avec rechargement �
     npm install
     npm run dev
     ```
-    Le serveur de développement Vite démarrera sur `http://localhost:5173` et communiquera avec le backend tournant dans Docker. L'inverse est bien sûr possible si vous souhaitez travailler sur le backend.
+    Le serveur de développement Vite démarrera sur `http://127.0.0.1:5173` et communiquera avec le backend tournant dans Docker. L'inverse est bien sûr possible si vous souhaitez travailler sur le backend.

@@ -30,7 +30,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - APP_FRONTEND_URL=http://localhost:5173
+      - APP_FRONTEND_URL=http://127.0.0.1:5173
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/event_app
       - SPRING_DATASOURCE_USERNAME=event_user
       - SPRING_DATASOURCE_PASSWORD=event_password
@@ -44,7 +44,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_IMGBB_API_KEY: 2b8e59d4aaf49f0c1e7ff772eb7dea64
-        VITE_API_URL: http://localhost:8080
+        VITE_API_URL: http://127.0.0.1:8080
     container_name: event_app_frontend
     ports:
       - "5173:80"
